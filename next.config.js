@@ -1,6 +1,9 @@
-/** @type {import("next").NextConfig} */
+/** @type {import('next').NextConfig} */
 const nextConfig = {
-  allowedDevOrigins: ["192.168.1.10"],
+  allowedDevOrigins: ["192.168.1.9"],
+  images: {
+    qualities: [75, 76],
+  },
 };
 
 module.exports = nextConfig;

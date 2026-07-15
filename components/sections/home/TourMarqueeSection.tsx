@@ -9,46 +9,38 @@ import {
   type CSSProperties,
   type KeyboardEvent,
 } from "react";
-
 const TOUR_ITEMS = [
   {
     text: "one8 Commune",
-    background: "/images/featured-reel-poster.JPG",
+    background: "/images/one commune.webp",
   },
   {
     text: "Hy.Press",
-    background: "/images/jkayy/tour/goa.webp",
+    background: "/images/featured-reel-poster.JPG",
   },
   {
     text: "MADA Club",
-    background: "/images/jkayy/tour/dubai.webp",
+    background: "/images/mada club.webp",
   },
-  {
-    text: "Ecstacy Delhi",
-    background: "/images/jkayy/tour/delhi.webp",
-  },
-  {
-    text: "Artbuzz Entertainment",
-    background: "/images/jkayy/tour/bangalore.webp",
-  },
+ 
+
   {
     text: "COVAH The Cavern",
-    background: "/images/jkayy/tour/hyderabad.webp",
+    background: "/images/COVAH The Cavern.webp",
   },
   {
     text: "Navvos",
-    background: "/images/jkayy/tour/hyderabad.webp",
+    background: "/images/navvos.webp",
   },
   {
     text: "Muzik Cartel",
-    background: "/images/jkayy/tour/hyderabad.webp",
+    background: "/images/muzik cartel.webp",
   },
   {
     text: "Chica",
-    background: "/images/jkayy/tour/hyderabad.webp",
+    background: "/images/chica.webp",
   },
 ] as const;
-
 const MARQUEE_ROWS = [
   {
     direction: "left",

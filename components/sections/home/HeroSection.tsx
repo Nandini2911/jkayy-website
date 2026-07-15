@@ -529,10 +529,10 @@ export default function HeroSection() {
               setVideoError(false);
             }}
           >
-            <source
-              src="/videos/jkayy-hero.mp4"
-              type="video/mp4"
-            />
+           <source
+  src="https://res.cloudinary.com/dl9zkv77/video/upload/Untitled_design_awrbkq.mp4"
+  type="video/mp4"
+/>
 
             Your browser does not support video
             playback.
@@ -1022,13 +1022,7 @@ export default function HeroSection() {
               </button>
 
               <div className="aspect-video w-full bg-black">
-                <iframe
-                  src="https://player.cloudinary.com/embed/?cloud_name=dl9zkv77&public_id=jkayyofficial_whwfpy"
-                  title="JKAYY official showreel"
-                  className="h-full w-full border-0"
-                  allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-                  allowFullScreen
-                />
+              
               </div>
             </motion.div>
           </motion.div>
