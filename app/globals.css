@@ -1,26 +1,565 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #050505;
+  --foreground: #f5f5f5;
+
+  --electric-blue: #2563eb;
+  --electric-purple: #7c3aed;
+  --chrome-silver: #d9e2f1;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+button,
+a {
+  cursor: pointer;
+}
+
+::selection {
+  background: rgba(37, 99, 235, 0.4);
+  color: white;
+}
+/* JKAYY NAVBAR */
+
+.jkayy-logo {
+  text-shadow:
+    0 0 10px rgba(255, 255, 255, 0.28),
+    0 0 24px rgba(59, 130, 246, 0.26),
+    0 0 50px rgba(124, 58, 237, 0.2);
+  animation: jkayy-logo-glow 4s ease-in-out infinite;
+}
+
+@keyframes jkayy-logo-glow {
+  0%,
+  100% {
+    text-shadow:
+      0 0 10px rgba(255, 255, 255, 0.2),
+      0 0 24px rgba(59, 130, 246, 0.18),
+      0 0 50px rgba(124, 58, 237, 0.14);
+  }
+
+  50% {
+    text-shadow:
+      0 0 14px rgba(255, 255, 255, 0.38),
+      0 0 34px rgba(59, 130, 246, 0.4),
+      0 0 70px rgba(124, 58, 237, 0.28);
+  }
+}
+
+.jkayy-nav-link::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 5px;
+  width: calc(100% - 24px);
+  height: 1px;
+  opacity: 0;
+  transform: translateX(-50%) scaleX(0);
+  transform-origin: center;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(96, 165, 250, 0.95),
+    rgba(168, 85, 247, 0.95),
+    transparent
+  );
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.75);
+  transition:
+    transform 350ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 350ms ease;
+}
+
+.jkayy-nav-link:hover::before {
+  opacity: 1;
+  transform: translateX(-50%) scaleX(1);
+}
+
+/* Liquid glass button */
+
+.jkayy-liquid-button {
+  isolation: isolate;
+  background:
+    linear-gradient(
+      115deg,
+      rgba(255, 255, 255, 0.08),
+      rgba(255, 255, 255, 0.025)
+    ),
+    rgba(5, 5, 5, 0.3);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 10px 35px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.jkayy-liquid-button::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  top: 120%;
+  width: 150%;
+  aspect-ratio: 1;
+  border-radius: 999px;
+  transform: translateX(-50%) scale(0.7);
+  background:
+    radial-gradient(
+      circle at 35% 30%,
+      rgba(255, 255, 255, 0.48),
+      transparent 20%
+    ),
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(59, 130, 246, 0.95),
+      rgba(124, 58, 237, 0.9) 50%,
+      rgba(5, 5, 5, 0) 72%
+    );
+  filter: blur(8px);
+  transition:
+    top 650ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 650ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.jkayy-liquid-button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    110deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.18) 48%,
+    transparent 75%
+  );
+  transform: translateX(-140%);
+  transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.jkayy-liquid-button:hover::before {
+  top: -85%;
+  transform: translateX(-50%) scale(1);
+}
+
+.jkayy-liquid-button:hover::after {
+  transform: translateX(140%);
+}
+
+.jkayy-liquid-button:hover {
+  border-color: rgba(147, 197, 253, 0.4);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 0 32px rgba(59, 130, 246, 0.22),
+    0 15px 45px rgba(0, 0, 0, 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jkayy-logo {
+    animation: none;
+  }
+
+  .jkayy-liquid-button::before,
+  .jkayy-liquid-button::after,
+  .jkayy-nav-link::before {
+    transition: none;
+  }
+}
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+::selection {
+  background: rgba(34, 211, 238, 0.3);
+  color: #ffffff;
+}
+
+/* Main browser scrollbar */
+
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #030303;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(34, 211, 238, 0.5);
+}
+
+/* Full-screen menu scrollbar */
+
+.jkayy-menu-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.jkayy-menu-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.jkayy-menu-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.jkayy-menu-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.jkayy-menu-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(34, 211, 238, 0.5);
+}
+.font-logo {
+  font-family: var(--font-logo), sans-serif;
+}
+.font-logo {
+  font-family: var(--font-michroma), sans-serif;
+}
+.font-logo {
+  font-family: var(--font-michroma), sans-serif;
+  font-synthesis: weight;
+}
+
+.jkayy-menu-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+.jkayy-menu-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.jkayy-menu-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.jkayy-menu-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.jkayy-menu-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(34, 211, 238, 0.55);
+}
+
+@media (max-width: 767px) {
+  .jkayy-menu-scroll {
+    scrollbar-width: none;
+  }
+
+  .jkayy-menu-scroll::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+.font-logo {
+  font-family: var(--font-michroma), sans-serif;
+}
+
+.jkayy-menu-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+.jkayy-menu-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.jkayy-menu-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.jkayy-menu-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+@media (max-width: 767px) {
+  .jkayy-menu-scroll {
+    scrollbar-width: none;
+  }
+
+  .jkayy-menu-scroll::-webkit-scrollbar {
+    display: none;
+  }
+}
+/* ========================================
+   JKAYY HERO EFFECTS
+======================================== */
+
+.jkayy-hero-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='.85'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  animation: jkayy-noise-shift 0.2s steps(2) infinite;
+  will-change: transform;
+}
+
+@keyframes jkayy-noise-shift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  25% {
+    transform: translate3d(3%, -2%, 0);
+  }
+
+  50% {
+    transform: translate3d(-2%, 3%, 0);
+  }
+
+  75% {
+    transform: translate3d(2%, 2%, 0);
+  }
+
+  100% {
+    transform: translate3d(-3%, -1%, 0);
+  }
+}
+
+/* Laser lines */
+
+.jkayy-hero-laser {
+  width: 75%;
+  height: 1px;
+  transform-origin: center;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(103, 232, 249, 0.9),
+    rgba(59, 130, 246, 0.5),
+    transparent
+  );
+  filter: blur(0.35px);
+  box-shadow:
+    0 0 8px rgba(34, 211, 238, 0.7),
+    0 0 22px rgba(37, 99, 235, 0.4);
+  opacity: 0.55;
+}
+
+.jkayy-hero-laser-one {
+  transform: rotate(18deg);
+  animation: jkayy-laser-one 6s ease-in-out infinite;
+}
+
+.jkayy-hero-laser-two {
+  transform: rotate(-24deg);
+  animation: jkayy-laser-two 7s ease-in-out infinite;
+}
+
+@keyframes jkayy-laser-one {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: rotate(15deg) translateX(-6%);
+  }
+
+  50% {
+    opacity: 0.75;
+    transform: rotate(22deg) translateX(4%);
+  }
+}
+
+@keyframes jkayy-laser-two {
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: rotate(-20deg) translateX(5%);
+  }
+
+  50% {
+    opacity: 0.65;
+    transform: rotate(-28deg) translateX(-4%);
+  }
+}
+
+/* Floating rays */
+
+.jkayy-light-ray {
+  width: 38vw;
+  min-width: 320px;
+  height: 110vh;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.09),
+    rgba(59, 130, 246, 0.035) 45%,
+    transparent 80%
+  );
+  filter: blur(25px);
+  transform-origin: top center;
+  mix-blend-mode: screen;
+}
+
+.jkayy-light-ray-one {
+  left: 14%;
+  top: -25%;
+  transform: rotate(23deg);
+  animation: jkayy-ray-one 9s ease-in-out infinite alternate;
+}
+
+.jkayy-light-ray-two {
+  right: 8%;
+  top: -30%;
+  transform: rotate(-20deg);
+  animation: jkayy-ray-two 11s ease-in-out infinite alternate;
+}
+
+.jkayy-light-ray-three {
+  left: 48%;
+  top: -45%;
+  opacity: 0.45;
+  transform: rotate(5deg);
+  animation: jkayy-ray-three 13s ease-in-out infinite alternate;
+}
+
+@keyframes jkayy-ray-one {
+  from {
+    opacity: 0.2;
+    transform: rotate(19deg) translateX(-5%);
+  }
+
+  to {
+    opacity: 0.55;
+    transform: rotate(28deg) translateX(8%);
+  }
+}
+
+@keyframes jkayy-ray-two {
+  from {
+    opacity: 0.16;
+    transform: rotate(-16deg) translateX(6%);
+  }
+
+  to {
+    opacity: 0.5;
+    transform: rotate(-27deg) translateX(-7%);
+  }
+}
+
+@keyframes jkayy-ray-three {
+  from {
+    opacity: 0.12;
+    transform: rotate(2deg) translateX(-3%);
+  }
+
+  to {
+    opacity: 0.35;
+    transform: rotate(10deg) translateX(5%);
+  }
+}
+
+@media (max-width: 767px) {
+  .jkayy-light-ray {
+    width: 75vw;
+    min-width: 280px;
+    filter: blur(32px);
+  }
+
+  .jkayy-hero-laser {
+    width: 115%;
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jkayy-hero-noise,
+  .jkayy-hero-laser,
+  .jkayy-light-ray {
+    animation: none;
+  }
+}
+
+/* ========================================
+   JKAYY CINEMATIC LETTER TITLE
+   Styling remains inherited from the original
+   Tailwind classes. These rules only support
+   responsive layout and smooth transforms.
+======================================== */
+
+.jkayy-hero-title-shell {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center center;
+  will-change: transform, opacity;
+}
+
+.jkayy-hero-title {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: baseline;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.jkayy-hero-letter {
+  display: inline-block;
+  color: transparent;
+  background-image: inherit;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  will-change: transform, opacity;
+}
+
+@media (max-width: 767px) {
+  .jkayy-hero-title-shell {
+    will-change: transform, opacity;
+  }
+
+  .jkayy-hero-letter {
+    will-change: transform, opacity;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jkayy-hero-title-shell,
+  .jkayy-hero-letter {
+    will-change: auto;
+  }
 }
