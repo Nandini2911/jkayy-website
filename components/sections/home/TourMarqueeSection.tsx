@@ -391,18 +391,23 @@ export default function TourMarqueeSection() {
       : "100svh";
 
   const sectionStyle: CSSProperties = {
+    // This section stays pinned while the next section scrolls over it.
     position: "sticky",
     top: 0,
-    zIndex: 1,
+    zIndex: 0,
     isolation: "isolate",
 
     width: "100%",
     minHeight: sectionHeight,
+    margin: 0,
 
     overflow: "hidden",
 
     color: "#f7f7f5",
     background: "#050505",
+
+    transform: "translateZ(0)",
+    backfaceVisibility: "hidden",
   };
 
   const backgroundContainerStyle: CSSProperties = {

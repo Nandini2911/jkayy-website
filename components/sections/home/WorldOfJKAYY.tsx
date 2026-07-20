@@ -64,8 +64,7 @@ const content = {
 };
 
 function useViewportWidth() {
-  const [viewportWidth, setViewportWidth] =
-    useState(1440);
+  const [viewportWidth, setViewportWidth] = useState(1440);
 
   useEffect(() => {
     const updateViewportWidth = () => {
@@ -107,11 +106,11 @@ function TypewriterText({
   instant = false,
   showCursor = true,
 }: TypewriterTextProps) {
-  const [displayedText, setDisplayedText] =
-    useState(instant ? text : "");
+  const [displayedText, setDisplayedText] = useState(
+    instant ? text : "",
+  );
 
-  const [completed, setCompleted] =
-    useState(instant);
+  const [completed, setCompleted] = useState(instant);
 
   useEffect(() => {
     if (!start) return;
@@ -238,8 +237,7 @@ function TypewriterText({
 }
 
 export default function AboutSection() {
-  const sectionRef =
-    useRef<HTMLElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
 
   const reduceMotion = useReducedMotion();
   const viewportWidth = useViewportWidth();
@@ -272,17 +270,14 @@ export default function AboutSection() {
     setImageFocused,
   ] = useState(false);
 
-  const showDesktopHoverImage = !isMobile;
-
   const imageIsActive =
-    showDesktopHoverImage &&
-    (showSecondaryImage || imageFocused);
+    showSecondaryImage || imageFocused;
 
   const handleImagePointerEnter = (
     event: ReactPointerEvent<HTMLDivElement>,
   ) => {
     if (
-      showDesktopHoverImage &&
+      !isMobile &&
       event.pointerType === "mouse"
     ) {
       setShowSecondaryImage(true);
@@ -292,26 +287,37 @@ export default function AboutSection() {
   const handleImagePointerLeave = (
     event: ReactPointerEvent<HTMLDivElement>,
   ) => {
-    if (event.pointerType === "mouse") {
+    if (
+      !isMobile &&
+      event.pointerType === "mouse"
+    ) {
       setShowSecondaryImage(false);
     }
+  };
+
+  const handleImageClick = () => {
+    if (!isMobile) return;
+
+    setShowSecondaryImage(
+      (currentValue) => !currentValue,
+    );
   };
 
   const handleImageKeyDown = (
     event: KeyboardEvent<HTMLDivElement>,
   ) => {
-    if (!showDesktopHoverImage) return;
-
     if (
-      event.key === "Enter" ||
-      event.key === " "
+      event.key !== "Enter" &&
+      event.key !== " "
     ) {
-      event.preventDefault();
-
-      setShowSecondaryImage(
-        (currentValue) => !currentValue,
-      );
+      return;
     }
+
+    event.preventDefault();
+
+    setShowSecondaryImage(
+      (currentValue) => !currentValue,
+    );
   };
 
   const sectionStyle: CSSProperties = {
@@ -380,46 +386,43 @@ export default function AboutSection() {
 
     overflow: "hidden",
 
-    cursor: showDesktopHoverImage
-      ? "pointer"
-      : "default",
-
+    cursor: "pointer",
     touchAction: "manipulation",
 
-    outline:
-      imageFocused && showDesktopHoverImage
-        ? "1px solid rgba(255,255,255,0.78)"
-        : "none",
+    outline: imageFocused
+      ? "1px solid rgba(255,255,255,0.78)"
+      : "none",
 
-    outlineOffset:
-      imageFocused && showDesktopHoverImage
-        ? "5px"
-        : undefined,
+    outlineOffset: imageFocused
+      ? "5px"
+      : undefined,
 
-    border: isMobile
-      ? "1px solid rgba(255,255,255,0.15)"
-      : imageIsActive
-        ? "1px solid rgba(255,255,255,0.52)"
+    border: imageIsActive
+      ? "1px solid rgba(255,255,255,0.52)"
+      : isMobile
+        ? "1px solid rgba(255,255,255,0.15)"
         : "1px solid rgba(255,255,255,0.18)",
 
     borderRadius: isMobile ? "20px" : "30px",
 
     background: "#080808",
 
-    boxShadow: isMobile
-      ? "0 18px 46px rgba(0,0,0,0.58)"
-      : imageIsActive
-        ? "0 34px 90px rgba(0,0,0,0.74), inset 0 1px 0 rgba(255,255,255,0.16)"
+    boxShadow: imageIsActive
+      ? isMobile
+        ? "0 24px 58px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.14)"
+        : "0 34px 90px rgba(0,0,0,0.74), inset 0 1px 0 rgba(255,255,255,0.16)"
+      : isMobile
+        ? "0 18px 46px rgba(0,0,0,0.58)"
         : "0 28px 80px rgba(0,0,0,0.68), inset 0 1px 0 rgba(255,255,255,0.1)",
 
-    transform:
-      !isMobile && imageIsActive
-        ? "translateY(-3px)"
-        : "none",
+    transform: imageIsActive
+      ? isMobile
+        ? "scale(0.99)"
+        : "translateY(-3px)"
+      : "none",
 
-    transition: isMobile
-      ? "none"
-      : "border-color 180ms ease, transform 220ms cubic-bezier(0.22,1,0.36,1), box-shadow 220ms ease",
+    transition:
+      "border-color 220ms ease, transform 300ms cubic-bezier(0.22,1,0.36,1), box-shadow 220ms ease",
   };
 
   const headingChromeFontSize =
@@ -567,7 +570,7 @@ export default function AboutSection() {
       </div>
 
       <div style={containerStyle}>
-        {/* IMAGE COMES FROM LEFT */}
+        {/* Image enters from left */}
 
         <motion.div
           initial={{
@@ -637,24 +640,11 @@ export default function AboutSection() {
             }}
           >
             <div
-              role={
-                showDesktopHoverImage
-                  ? "button"
-                  : undefined
-              }
-              tabIndex={
-                showDesktopHoverImage ? 0 : -1
-              }
-              aria-label={
-                showDesktopHoverImage
-                  ? "Show alternate JKAYY portrait"
-                  : undefined
-              }
-              aria-pressed={
-                showDesktopHoverImage
-                  ? showSecondaryImage
-                  : undefined
-              }
+              role="button"
+              tabIndex={0}
+              aria-label="Switch JKAYY portrait"
+              aria-pressed={showSecondaryImage}
+              onClick={handleImageClick}
               onPointerEnter={
                 handleImagePointerEnter
               }
@@ -663,52 +653,52 @@ export default function AboutSection() {
               }
               onKeyDown={handleImageKeyDown}
               onFocus={() => {
-                if (showDesktopHoverImage) {
-                  setImageFocused(true);
+                setImageFocused(true);
+
+                if (!isMobile) {
                   setShowSecondaryImage(true);
                 }
               }}
               onBlur={() => {
                 setImageFocused(false);
-                setShowSecondaryImage(false);
+
+                if (!isMobile) {
+                  setShowSecondaryImage(false);
+                }
               }}
               style={imageFrameStyle}
             >
-              {!isMobile && (
-                <>
-                  <div
-                    style={{
-                      position: "absolute",
-                      inset: 0,
-                      zIndex: 2,
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  zIndex: 2,
 
-                      pointerEvents: "none",
+                  pointerEvents: "none",
 
-                      borderRadius: "inherit",
+                  borderRadius: "inherit",
 
-                      background:
-                        "linear-gradient(145deg, rgba(255,255,255,0.08), transparent 28%, transparent 72%, rgba(255,255,255,0.035))",
-                    }}
-                  />
+                  background:
+                    "linear-gradient(145deg, rgba(255,255,255,0.08), transparent 28%, transparent 72%, rgba(255,255,255,0.035))",
+                }}
+              />
 
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: "14%",
-                      zIndex: 5,
+              <div
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: "14%",
+                  zIndex: 5,
 
-                      width: "52%",
-                      height: "1px",
+                  width: "52%",
+                  height: "1px",
 
-                      pointerEvents: "none",
+                  pointerEvents: "none",
 
-                      background:
-                        "linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent)",
-                    }}
-                  />
-                </>
-              )}
+                  background:
+                    "linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent)",
+                }}
+              />
 
               <div
                 style={{
@@ -721,6 +711,8 @@ export default function AboutSection() {
                   background: "#050505",
                 }}
               >
+                {/* Original image */}
+
                 <Image
                   src="/images/jkayy-about.webp"
                   alt="JKAYY professional artist portrait"
@@ -742,64 +734,58 @@ export default function AboutSection() {
                     filter:
                       "grayscale(100%) contrast(1.05)",
 
-                    opacity:
-                      showSecondaryImage &&
-                      showDesktopHoverImage
-                        ? 0
-                        : 1,
+                    opacity: showSecondaryImage
+                      ? 0
+                      : 1,
 
-                    transform:
-                      showSecondaryImage &&
-                      showDesktopHoverImage
-                        ? "scale(0.998)"
-                        : isMobile
-                          ? "none"
-                          : "scale(1.01)",
+                    transform: showSecondaryImage
+                      ? "scale(0.998)"
+                      : "scale(1.01)",
 
-                    transition: isMobile
-                      ? "none"
-                      : "opacity 130ms linear, transform 220ms cubic-bezier(0.22,1,0.36,1)",
+                    transition:
+                      "opacity 320ms ease, transform 500ms cubic-bezier(0.22,1,0.36,1)",
+
+                    pointerEvents: "none",
                   }}
                 />
 
-                {showDesktopHoverImage && (
-                  <Image
-                    src="/images/jkayy-about-hover.webp"
-                    alt="JKAYY performing live"
-                    fill
-                    loading="eager"
-                    quality={76}
-                    draggable={false}
-                    sizes="46vw"
-                    style={{
-                      zIndex: 2,
+                {/* Alternate image — desktop hover and mobile tap */}
 
-                      objectFit: "cover",
-                      objectPosition:
-                        "center top",
+                <Image
+                  src="/images/jkayy-about-hover.webp"
+                  alt="JKAYY performing live"
+                  fill
+                  loading="eager"
+                  quality={76}
+                  draggable={false}
+                  sizes="(max-width: 640px) 92vw, (max-width: 900px) 86vw, 46vw"
+                  style={{
+                    zIndex: 2,
 
-                      userSelect: "none",
-                      backfaceVisibility:
-                        "hidden",
+                    objectFit: "cover",
+                    objectPosition: "center top",
 
-                      filter:
-                        "grayscale(100%) contrast(1.05)",
+                    userSelect: "none",
+                    backfaceVisibility:
+                      "hidden",
 
-                      opacity:
-                        showSecondaryImage
-                          ? 1
-                          : 0,
+                    filter:
+                      "grayscale(100%) contrast(1.05)",
 
-                      transform:
-                        showSecondaryImage
-                          ? "scale(1.01)"
-                          : "scale(1.025)",
+                    opacity: showSecondaryImage
+                      ? 1
+                      : 0,
 
-                      transition:
-                        "opacity 130ms linear, transform 220ms cubic-bezier(0.22,1,0.36,1)",
-                    }}
-                  />
-                )}
+                    transform: showSecondaryImage
+                      ? "scale(1.01)"
+                      : "scale(1.035)",
+
+                    transition:
+                      "opacity 320ms ease, transform 500ms cubic-bezier(0.22,1,0.36,1)",
+
+                    pointerEvents: "none",
+                  }}
+                />
               </div>
 
               <div
@@ -816,117 +802,186 @@ export default function AboutSection() {
                 }}
               />
 
-              {!isMobile && (
-                <>
+              {/* Tap indicator for mobile */}
+
+              {isMobile && (
+                <motion.div
+                  aria-hidden="true"
+                  initial={{
+                    opacity: 0,
+                    y: 8,
+                  }}
+                  animate={
+                    sectionInView
+                      ? {
+                          opacity: 1,
+                          y: 0,
+                        }
+                      : {
+                          opacity: 0,
+                          y: 8,
+                        }
+                  }
+                  transition={{
+                    duration: minimalMotion
+                      ? 0
+                      : 0.45,
+                    delay: minimalMotion
+                      ? 0
+                      : 0.7,
+                  }}
+                  style={{
+                    position: "absolute",
+                    right: "14px",
+                    bottom: "14px",
+                    zIndex: 7,
+
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "7px",
+
+                    padding: "8px 11px",
+
+                    border:
+                      "1px solid rgba(255,255,255,0.18)",
+                    borderRadius: "999px",
+
+                    color:
+                      "rgba(255,255,255,0.78)",
+
+                    background:
+                      "rgba(0,0,0,0.55)",
+
+                    backdropFilter: "blur(8px)",
+                    WebkitBackdropFilter:
+                      "blur(8px)",
+
+                    fontSize: "7px",
+                    fontWeight: 600,
+                    letterSpacing: "0.18em",
+                    textTransform: "uppercase",
+
+                    pointerEvents: "none",
+                  }}
+                >
                   <span
                     style={{
-                      position: "absolute",
-                      top: "14px",
-                      left: "14px",
-                      zIndex: 6,
-
-                      width: "26px",
-                      height: "26px",
-
-                      pointerEvents: "none",
-
-                      opacity: imageIsActive
-                        ? 1
-                        : 0.72,
-
-                      borderTop:
-                        "1px solid #ffffff",
-
-                      borderLeft:
-                        "1px solid #ffffff",
-
-                      transition:
-                        "opacity 160ms ease",
+                      width: "5px",
+                      height: "5px",
+                      borderRadius: "50%",
+                      background: "#ffffff",
+                      boxShadow:
+                        "0 0 8px rgba(255,255,255,0.65)",
                     }}
                   />
 
-                  <span
-                    style={{
-                      position: "absolute",
-                      top: "14px",
-                      right: "14px",
-                      zIndex: 6,
-
-                      width: "26px",
-                      height: "26px",
-
-                      pointerEvents: "none",
-
-                      opacity: imageIsActive
-                        ? 1
-                        : 0.72,
-
-                      borderTop:
-                        "1px solid #ffffff",
-
-                      borderRight:
-                        "1px solid #ffffff",
-
-                      transition:
-                        "opacity 160ms ease",
-                    }}
-                  />
-
-                  <span
-                    style={{
-                      position: "absolute",
-                      bottom: "14px",
-                      left: "14px",
-                      zIndex: 6,
-
-                      width: "26px",
-                      height: "26px",
-
-                      pointerEvents: "none",
-
-                      opacity: imageIsActive
-                        ? 1
-                        : 0.72,
-
-                      borderBottom:
-                        "1px solid rgba(255,255,255,0.78)",
-
-                      borderLeft:
-                        "1px solid rgba(255,255,255,0.78)",
-
-                      transition:
-                        "opacity 160ms ease",
-                    }}
-                  />
-
-                  <span
-                    style={{
-                      position: "absolute",
-                      right: "14px",
-                      bottom: "14px",
-                      zIndex: 6,
-
-                      width: "26px",
-                      height: "26px",
-
-                      pointerEvents: "none",
-
-                      opacity: imageIsActive
-                        ? 1
-                        : 0.72,
-
-                      borderRight:
-                        "1px solid rgba(255,255,255,0.78)",
-
-                      borderBottom:
-                        "1px solid rgba(255,255,255,0.78)",
-
-                      transition:
-                        "opacity 160ms ease",
-                    }}
-                  />
-                </>
+                  {showSecondaryImage
+                    ? "Tap to return"
+                    : "Tap to view"}
+                </motion.div>
               )}
+
+              {/* Corner details */}
+
+              <span
+                style={{
+                  position: "absolute",
+                  top: isMobile ? "10px" : "14px",
+                  left: isMobile ? "10px" : "14px",
+                  zIndex: 6,
+
+                  width: isMobile ? "20px" : "26px",
+                  height: isMobile ? "20px" : "26px",
+
+                  pointerEvents: "none",
+
+                  opacity: imageIsActive ? 1 : 0.72,
+
+                  borderTop:
+                    "1px solid #ffffff",
+
+                  borderLeft:
+                    "1px solid #ffffff",
+
+                  transition:
+                    "opacity 160ms ease",
+                }}
+              />
+
+              <span
+                style={{
+                  position: "absolute",
+                  top: isMobile ? "10px" : "14px",
+                  right: isMobile ? "10px" : "14px",
+                  zIndex: 6,
+
+                  width: isMobile ? "20px" : "26px",
+                  height: isMobile ? "20px" : "26px",
+
+                  pointerEvents: "none",
+
+                  opacity: imageIsActive ? 1 : 0.72,
+
+                  borderTop:
+                    "1px solid #ffffff",
+
+                  borderRight:
+                    "1px solid #ffffff",
+
+                  transition:
+                    "opacity 160ms ease",
+                }}
+              />
+
+              <span
+                style={{
+                  position: "absolute",
+                  bottom: isMobile ? "10px" : "14px",
+                  left: isMobile ? "10px" : "14px",
+                  zIndex: 6,
+
+                  width: isMobile ? "20px" : "26px",
+                  height: isMobile ? "20px" : "26px",
+
+                  pointerEvents: "none",
+
+                  opacity: imageIsActive ? 1 : 0.72,
+
+                  borderBottom:
+                    "1px solid rgba(255,255,255,0.78)",
+
+                  borderLeft:
+                    "1px solid rgba(255,255,255,0.78)",
+
+                  transition:
+                    "opacity 160ms ease",
+                }}
+              />
+
+              <span
+                style={{
+                  position: "absolute",
+                  right: isMobile ? "10px" : "14px",
+                  bottom: isMobile ? "10px" : "14px",
+                  zIndex: 6,
+
+                  width: isMobile ? "20px" : "26px",
+                  height: isMobile ? "20px" : "26px",
+
+                  pointerEvents: "none",
+
+                  opacity: imageIsActive ? 1 : 0.72,
+
+                  borderRight:
+                    "1px solid rgba(255,255,255,0.78)",
+
+                  borderBottom:
+                    "1px solid rgba(255,255,255,0.78)",
+
+                  transition:
+                    "opacity 160ms ease",
+                }}
+              />
             </div>
           </div>
 
@@ -1025,7 +1080,7 @@ export default function AboutSection() {
           </motion.div>
         </motion.div>
 
-        {/* TEXT COMES FROM RIGHT */}
+        {/* Text enters from right */}
 
         <motion.div
           initial={{

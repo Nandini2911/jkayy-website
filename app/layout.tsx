@@ -11,7 +11,8 @@ const michroma = Michroma({
 
 export const metadata: Metadata = {
   title: "JKAYY",
-  description: "JKAYY — Artist, Performer and Live Experience",
+  description:
+    "JKAYY — Artist, Performer and Live Experience",
 };
 
 export default function RootLayout({
@@ -20,8 +21,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      suppressHydrationWarning
+    >
       <body
+        suppressHydrationWarning
         className={`${michroma.variable} bg-[#050505] text-white antialiased`}
       >
         {children}

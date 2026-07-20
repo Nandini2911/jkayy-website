@@ -2,43 +2,150 @@
 
 import {
   useEffect,
+  useRef,
   useState,
   type CSSProperties,
 } from "react";
 
-const PERFORMANCE_VIDEO = "/videos/featured.mp4";
+// Desktop and tablet video
+const DESKTOP_CLOUDINARY_VIDEO_URL =
+  "https://player.cloudinary.com/embed/?cloud_name=dl9zkv77&public_id=Untitled_design_2_ftmu1d";
 
-// Full section background image
+// Mobile video
+const MOBILE_CLOUDINARY_VIDEO_URL =
+  "https://player.cloudinary.com/embed/?cloud_name=dl9zkv77&public_id=2e39652c-6c4f-4c82-94a4-8b982d3ce785_m2vatb";
+
 const SECTION_BACKGROUND_IMAGE =
-  "/images/featured-section-bg.webp";
+  "/images/featured-sectio-bg.webp";
 
-// Video cover/poster image
-const VIDEO_POSTER_IMAGE =
-  "/images/featured-video-cover.webp";
+const VIDEO_COVER_IMAGE =
+  "/images/COVAH The Cavern.webp";
+
+function getAutoplayVideoUrl(url: string) {
+  const separator = url.includes("?") ? "&" : "?";
+
+  return `${url}${separator}autoplay=true&controls=true&playsinline=true`;
+}
 
 export default function FeaturedPerformanceReel() {
-  const [screenWidth, setScreenWidth] = useState(1440);
+  const sectionRef = useRef<HTMLElement>(null);
+  const resizeFrameRef = useRef<number | null>(null);
 
+  const [screenWidth, setScreenWidth] =
+    useState(1440);
+
+  const [videoStarted, setVideoStarted] =
+    useState(false);
+
+  /*
+   * Responsive screen size.
+   */
   useEffect(() => {
-    const handleResize = () => {
-      setScreenWidth(window.innerWidth);
+    const updateScreenWidth = () => {
+      if (resizeFrameRef.current !== null) {
+        cancelAnimationFrame(
+          resizeFrameRef.current,
+        );
+      }
+
+      resizeFrameRef.current =
+        requestAnimationFrame(() => {
+          setScreenWidth(window.innerWidth);
+          resizeFrameRef.current = null;
+        });
     };
 
-    handleResize();
+    updateScreenWidth();
 
-    window.addEventListener("resize", handleResize);
+    window.addEventListener(
+      "resize",
+      updateScreenWidth,
+      {
+        passive: true,
+      },
+    );
 
     return () => {
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener(
+        "resize",
+        updateScreenWidth,
+      );
+
+      if (resizeFrameRef.current !== null) {
+        cancelAnimationFrame(
+          resizeFrameRef.current,
+        );
+      }
+    };
+  }, []);
+
+  /*
+   * Stop video when the complete section
+   * leaves the viewport.
+   *
+   * Setting videoStarted to false unmounts
+   * the iframe, which completely stops audio
+   * and video playback.
+   */
+  useEffect(() => {
+    const sectionElement = sectionRef.current;
+
+    if (!sectionElement) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) {
+          setVideoStarted(false);
+        }
+      },
+      {
+        threshold: 0.02,
+      },
+    );
+
+    observer.observe(sectionElement);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  /*
+   * Stop video when browser tab becomes hidden.
+   */
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setVideoStarted(false);
+      }
+    };
+
+    document.addEventListener(
+      "visibilitychange",
+      handleVisibilityChange,
+    );
+
+    return () => {
+      document.removeEventListener(
+        "visibilitychange",
+        handleVisibilityChange,
+      );
     };
   }, []);
 
   const isMobile = screenWidth <= 767;
   const isTablet = screenWidth <= 991;
 
+  const selectedVideoUrl = isMobile
+    ? MOBILE_CLOUDINARY_VIDEO_URL
+    : DESKTOP_CLOUDINARY_VIDEO_URL;
+
+  const autoplayVideoUrl =
+    getAutoplayVideoUrl(selectedVideoUrl);
+
   const sectionStyle: CSSProperties = {
     position: "relative",
-    zIndex: 5,
+    zIndex: 10,
     isolation: "isolate",
 
     display: "flex",
@@ -47,34 +154,52 @@ export default function FeaturedPerformanceReel() {
     width: "100%",
     minHeight: "100svh",
 
-    boxSizing: "border-box",
-
+    margin: 0,
     padding: isMobile
       ? "60px 16px"
       : isTablet
         ? "70px 28px"
         : "80px 48px",
 
+    boxSizing: "border-box",
     overflow: "hidden",
 
     color: "#ffffff",
+    background: "rgba(5, 5, 5, 0.82)",
 
-    background: "rgba(5, 5, 5, 0.16)",
+    backdropFilter: isMobile
+      ? "blur(8px)"
+      : "blur(12px)",
 
-    backdropFilter: "blur(3px)",
-    WebkitBackdropFilter: "blur(3px)",
+    WebkitBackdropFilter: isMobile
+      ? "blur(8px)"
+      : "blur(12px)",
 
-    borderTop: "1px solid rgba(255,255,255,0.12)",
+    borderTop:
+      "1px solid rgba(255,255,255,0.14)",
 
-    boxShadow: "0 -30px 80px rgba(0,0,0,0.3)",
+    borderTopLeftRadius: isMobile
+      ? "24px"
+      : "42px",
+
+    borderTopRightRadius: isMobile
+      ? "24px"
+      : "42px",
+
+    boxShadow:
+      "0 -34px 100px rgba(0,0,0,0.78), 0 -1px 0 rgba(255,255,255,0.04)",
+
+    transform: "translateZ(0)",
+    backfaceVisibility: "hidden",
   };
 
   return (
     <section
+      ref={sectionRef}
       id="featured-performance"
       style={sectionStyle}
     >
-      {/* Separate section background image */}
+      {/* Section Background Image */}
 
       <div
         aria-hidden="true"
@@ -84,7 +209,7 @@ export default function FeaturedPerformanceReel() {
           zIndex: -3,
 
           backgroundImage: `url("${SECTION_BACKGROUND_IMAGE}")`,
-          backgroundPosition: "center center",
+          backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
           backgroundSize: "cover",
 
@@ -95,7 +220,7 @@ export default function FeaturedPerformanceReel() {
         }}
       />
 
-      {/* Light dark overlay */}
+      {/* Dark Overlay */}
 
       <div
         aria-hidden="true"
@@ -107,11 +232,11 @@ export default function FeaturedPerformanceReel() {
           pointerEvents: "none",
 
           background:
-            "linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.3)), linear-gradient(90deg, rgba(0,0,0,0.22), rgba(0,0,0,0.02), rgba(0,0,0,0.22))",
+            "linear-gradient(to bottom, rgba(0,0,0,0.16), rgba(0,0,0,0.46)), linear-gradient(90deg, rgba(0,0,0,0.28), rgba(0,0,0,0.04), rgba(0,0,0,0.28))",
         }}
       />
 
-      {/* Small glow */}
+      {/* Background Glow */}
 
       <div
         aria-hidden="true"
@@ -129,13 +254,17 @@ export default function FeaturedPerformanceReel() {
           background:
             "radial-gradient(circle, rgba(96,165,250,0.06), transparent 70%)",
 
-          filter: isMobile ? "blur(22px)" : "blur(32px)",
+          filter: isMobile
+            ? "blur(22px)"
+            : "blur(32px)",
 
           transform: "translate(-50%, -50%)",
 
           pointerEvents: "none",
         }}
       />
+
+      {/* Main Content */}
 
       <div
         style={{
@@ -148,65 +277,7 @@ export default function FeaturedPerformanceReel() {
           margin: "0 auto",
         }}
       >
-        {/* Section heading */}
-
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-
-            gap: isMobile ? "10px" : "16px",
-
-            marginBottom: isMobile ? "20px" : "26px",
-          }}
-        >
-          <span
-            style={{
-              color: "#60a5fa",
-
-              fontFamily: "monospace",
-              fontSize: "10px",
-              letterSpacing: "0.25em",
-
-              textShadow:
-                "0 2px 10px rgba(0,0,0,0.7)",
-            }}
-          >
-            03
-          </span>
-
-          <span
-            style={{
-              width: isMobile ? "28px" : "44px",
-              height: "1px",
-
-              background:
-                "linear-gradient(90deg, #60a5fa, rgba(96,165,250,0.2))",
-            }}
-          />
-
-          <span
-            style={{
-              color: "rgba(255,255,255,0.88)",
-
-              fontSize: isMobile ? "9px" : "11px",
-              fontWeight: 500,
-
-              letterSpacing: isMobile
-                ? "0.15em"
-                : "0.22em",
-
-              textTransform: "uppercase",
-
-              textShadow:
-                "0 2px 12px rgba(0,0,0,0.8)",
-            }}
-          >
-            Featured Performance Reel
-          </span>
-        </div>
-
-        {/* Video frame */}
+        {/* Video Frame */}
 
         <div
           style={{
@@ -215,10 +286,10 @@ export default function FeaturedPerformanceReel() {
             width: "100%",
 
             height: isMobile
-              ? "min(55svh, 500px)"
+              ? "min(75svh, 500px)"
               : isTablet
-                ? "min(62svh, 620px)"
-                : "min(66svh, 720px)",
+                ? "min(82svh, 620px)"
+                : "min(86svh, 720px)",
 
             overflow: "hidden",
 
@@ -231,62 +302,191 @@ export default function FeaturedPerformanceReel() {
                 ? "22px"
                 : "26px",
 
-            background: "rgba(0,0,0,0.35)",
+            background: "#000000",
 
             boxShadow:
-              "0 26px 70px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.12)",
+              "0 28px 90px rgba(0,0,0,0.5)",
+
+            transform: "translateZ(0)",
+            backfaceVisibility: "hidden",
           }}
         >
-          <video
-            src={PERFORMANCE_VIDEO}
-            controls
-            playsInline
-            preload="metadata"
+          {/* 
+            The iframe is only rendered after
+            clicking the play button.
 
-            // Separate video cover image
-            poster={VIDEO_POSTER_IMAGE}
+            When videoStarted becomes false,
+            iframe is removed and video stops.
+          */}
 
-            style={{
-              position: "absolute",
-              inset: 0,
+          {videoStarted && (
+            <iframe
+              key={
+                isMobile
+                  ? "mobile-playing-video"
+                  : "desktop-playing-video"
+              }
+              src={autoplayVideoUrl}
+              title="JKAYY featured performance reel"
+              allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+              allowFullScreen
+              loading="eager"
+              referrerPolicy="strict-origin-when-cross-origin"
+              style={{
+                position: "absolute",
+                inset: 0,
 
-              display: "block",
+                display: "block",
 
-              width: "100%",
-              height: "100%",
+                width: "100%",
+                height: "100%",
 
-              border: 0,
+                border: 0,
+                background: "#000000",
+              }}
+            />
+          )}
 
-              background: "#000000",
-              objectFit: "cover",
-              objectPosition: "center center",
-            }}
-          >
-            Your browser does not support the video tag.
-          </video>
+          {/* Video Cover */}
+
+          {!videoStarted && (
+            <button
+              type="button"
+              onClick={() =>
+                setVideoStarted(true)
+              }
+              aria-label="Play JKAYY featured performance reel"
+              style={{
+                position: "absolute",
+                inset: 0,
+                zIndex: 4,
+
+                display: "block",
+
+                width: "100%",
+                height: "100%",
+
+                padding: 0,
+                border: 0,
+
+                overflow: "hidden",
+                cursor: "pointer",
+
+                backgroundColor: "#000000",
+                backgroundImage: `url("${VIDEO_COVER_IMAGE}")`,
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+                backgroundSize: "cover",
+              }}
+            >
+              {/* Cover Dark Overlay */}
+
+              <span
+                aria-hidden="true"
+                style={{
+                  position: "absolute",
+                  inset: 0,
+
+                  background:
+                    "linear-gradient(to top, rgba(0,0,0,0.52), rgba(0,0,0,0.05) 60%)",
+
+                  pointerEvents: "none",
+                }}
+              />
+
+              {/* Play Button */}
+
+              <span
+                aria-hidden="true"
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+
+                  width: isMobile
+                    ? "62px"
+                    : "78px",
+
+                  height: isMobile
+                    ? "62px"
+                    : "78px",
+
+                  border:
+                    "1px solid rgba(255,255,255,0.48)",
+
+                  borderRadius: "50%",
+
+                  color: "#000000",
+                  background:
+                    "rgba(255,255,255,0.92)",
+
+                  boxShadow:
+                    "0 15px 45px rgba(0,0,0,0.45)",
+
+                  transform:
+                    "translate(-50%, -50%)",
+
+                  backdropFilter: "blur(8px)",
+                  WebkitBackdropFilter:
+                    "blur(8px)",
+
+                  pointerEvents: "none",
+                }}
+              >
+                <span
+                  style={{
+                    width: 0,
+                    height: 0,
+
+                    marginLeft: "5px",
+
+                    borderTop: isMobile
+                      ? "9px solid transparent"
+                      : "11px solid transparent",
+
+                    borderBottom: isMobile
+                      ? "9px solid transparent"
+                      : "11px solid transparent",
+
+                    borderLeft: isMobile
+                      ? "15px solid #000000"
+                      : "18px solid #000000",
+                  }}
+                />
+              </span>
+            </button>
+          )}
+
+          {/* Frame Highlight */}
 
           <div
             aria-hidden="true"
             style={{
               position: "absolute",
               inset: 0,
-              zIndex: 2,
+              zIndex: 5,
 
               borderRadius: "inherit",
 
-              pointerEvents: "none",
-
               background:
                 "linear-gradient(145deg, rgba(255,255,255,0.06), transparent 26%, transparent 76%, rgba(255,255,255,0.02))",
+
+              pointerEvents: "none",
             }}
           />
         </div>
 
-        {/* Bottom title */}
+        {/* Bottom Title */}
 
         <div
           style={{
-            marginTop: isMobile ? "16px" : "20px",
+            marginTop: isMobile
+              ? "16px"
+              : "20px",
           }}
         >
           <h2
@@ -314,7 +514,8 @@ export default function FeaturedPerformanceReel() {
             style={{
               margin: "7px 0 0",
 
-              color: "rgba(255,255,255,0.78)",
+              color:
+                "rgba(255,255,255,0.78)",
 
               fontSize: "10px",
               fontWeight: 500,

@@ -2,7 +2,7 @@
 const nextConfig = {
   allowedDevOrigins: ["192.168.1.9"],
   images: {
-    qualities: [75, 76],
+    qualities: [75, 76, 82, 90],
   },
 };
 

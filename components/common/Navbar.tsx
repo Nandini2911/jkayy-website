@@ -19,14 +19,14 @@ const menuItems: MenuItem[] = [
     roman: "I",
     label: "Home",
     description: "Enter the world of JKAYY",
-    href: "#home",
+    href: "/",
     image: "/menu/home.webp",
   },
   {
     roman: "II",
     label: "About",
     description: "Artist, performer and creator",
-    href: "#about",
+    href: "/about",
     image: "/menu/about.webp",
   },
   {
@@ -63,13 +63,51 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeItem, setActiveItem] = useState<MenuItem>(menuItems[0]);
   const [scrolled, setScrolled] = useState(false);
+  const [navVisible, setNavVisible] = useState(true);
   const [previewError, setPreviewError] = useState(false);
 
   const menuScrollRef = useRef<HTMLDivElement>(null);
+  const lastScrollYRef = useRef(0);
+  const scrollFrameRef = useRef<number | null>(null);
 
+  /*
+   * Navbar scroll behaviour:
+   * Scroll down = hide navbar
+   * Scroll up = show navbar
+   * Top of page = always show navbar
+   * Menu open = always show navbar
+   */
   useEffect(() => {
+    lastScrollYRef.current = Math.max(window.scrollY, 0);
+
+    if (menuOpen) {
+      setNavVisible(true);
+    }
+
     const handleScroll = () => {
-      setScrolled(window.scrollY > 40);
+      if (scrollFrameRef.current !== null) return;
+
+      scrollFrameRef.current = window.requestAnimationFrame(() => {
+        const currentScrollY = Math.max(window.scrollY, 0);
+        const previousScrollY = lastScrollYRef.current;
+        const scrollDifference = currentScrollY - previousScrollY;
+
+        setScrolled(currentScrollY > 40);
+
+        if (menuOpen || currentScrollY <= 20) {
+          setNavVisible(true);
+        } else if (
+          scrollDifference > 4 &&
+          currentScrollY > 80
+        ) {
+          setNavVisible(false);
+        } else if (scrollDifference < -4) {
+          setNavVisible(true);
+        }
+
+        lastScrollYRef.current = currentScrollY;
+        scrollFrameRef.current = null;
+      });
     };
 
     handleScroll();
@@ -80,9 +118,17 @@ export default function Navbar() {
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
 
+      if (scrollFrameRef.current !== null) {
+        window.cancelAnimationFrame(scrollFrameRef.current);
+        scrollFrameRef.current = null;
+      }
+    };
+  }, [menuOpen]);
+
+  /*
+   * Lock body scroll when full-screen menu is open.
+   */
   useEffect(() => {
     if (!menuOpen) {
       document.body.style.overflow = "";
@@ -104,6 +150,9 @@ export default function Navbar() {
     };
   }, [menuOpen]);
 
+  /*
+   * Close menu with Escape key.
+   */
   useEffect(() => {
     if (!menuOpen) return;
 
@@ -123,6 +172,7 @@ export default function Navbar() {
   const openMenu = () => {
     setActiveItem(menuItems[0]);
     setPreviewError(false);
+    setNavVisible(true);
     setMenuOpen(true);
   };
 
@@ -138,13 +188,17 @@ export default function Navbar() {
   return (
     <>
       {/* Main Navbar */}
-    <header
-  className={`fixed inset-x-0 top-0 z-[100] pointer-events-auto transition-all duration-500 ${
-    scrolled
-      ? "border-b border-white/10 bg-black/75 shadow-[0_18px_60px_rgba(0,0,0,0.45)] backdrop-blur-2xl"
-      : "bg-transparent"
-  }`}
->
+      <header
+        className={`fixed inset-x-0 top-0 z-[100] transform-gpu transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          navVisible || menuOpen
+            ? "pointer-events-auto translate-y-0 opacity-100"
+            : "pointer-events-none -translate-y-[110%] opacity-0"
+        } ${
+          scrolled
+            ? "border-b border-white/10 bg-black/75 shadow-[0_18px_60px_rgba(0,0,0,0.45)] backdrop-blur-2xl"
+            : "bg-transparent"
+        }`}
+      >
         <nav className="mx-auto flex h-[68px] max-w-[1600px] items-center justify-between px-4 sm:h-[74px] sm:px-6 md:h-[82px] md:px-10">
           {/* JK Logo */}
           <Link
@@ -183,26 +237,26 @@ export default function Navbar() {
           </Link>
 
           {/* Menu Button */}
-         <button
-  type="button"
-  onClick={openMenu}
-  className="
-    group
-    relative
-    z-[120]
-    flex
-    shrink-0
-    touch-manipulation
-    select-none
-    items-center
-    gap-2.5
-    pointer-events-auto
-    sm:gap-3
-    md:gap-4
-  "
-  aria-label="Open navigation menu"
-  aria-expanded={menuOpen}
->
+          <button
+            type="button"
+            onClick={openMenu}
+            className="
+              group
+              relative
+              z-[120]
+              flex
+              shrink-0
+              touch-manipulation
+              select-none
+              items-center
+              gap-2.5
+              pointer-events-auto
+              sm:gap-3
+              md:gap-4
+            "
+            aria-label="Open navigation menu"
+            aria-expanded={menuOpen}
+          >
             <span
               className="
                 font-logo
@@ -418,7 +472,8 @@ export default function Navbar() {
                 >
                   <div className="flex min-h-full flex-col justify-start py-2 sm:py-3 md:py-4 2xl:justify-center">
                     {menuItems.map((item, index) => {
-                      const selected = activeItem.label === item.label;
+                      const selected =
+                        activeItem.label === item.label;
 
                       return (
                         <motion.div
@@ -430,12 +485,16 @@ export default function Navbar() {
                             duration: 0.5,
                             ease: [0.22, 1, 0.36, 1],
                           }}
-                          onPointerEnter={() => selectMenuItem(item)}
+                          onPointerEnter={() =>
+                            selectMenuItem(item)
+                          }
                         >
                           <Link
                             href={item.href}
                             onClick={closeMenu}
-                            onFocus={() => selectMenuItem(item)}
+                            onFocus={() =>
+                              selectMenuItem(item)
+                            }
                             className="group relative flex min-h-[70px] min-w-0 items-center border-b border-white/15 sm:min-h-[78px] md:min-h-[88px] xl:min-h-[98px]"
                           >
                             <span
@@ -500,7 +559,7 @@ export default function Navbar() {
                       );
                     })}
 
-                    {/* One mobile image below Contact only */}
+                    {/* Mobile Image Below Contact */}
                     <motion.div
                       initial={{ opacity: 0, y: 24 }}
                       animate={{ opacity: 1, y: 0 }}
