@@ -227,7 +227,7 @@ export default function HeroSection() {
           loop
           playsInline
           preload="auto"
-          poster="/images/jkayy-hero-poster.webp"
+          poster="/images/about2.webp"
           className="h-full w-full object-cover object-center"
           style={{
             transform: "translate3d(0, 0, 0)",
@@ -256,7 +256,7 @@ export default function HeroSection() {
       {videoError && (
         <div
           aria-hidden="true"
-          className="absolute inset-0 z-[1] bg-[url('/images/jkayy-hero-poster.webp')] bg-cover bg-center"
+          className="absolute inset-0 z-[1] bg-[url('/images/about2.webp')] bg-cover bg-center"
         />
       )}
 

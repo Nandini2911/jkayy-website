@@ -16,7 +16,7 @@ const MOBILE_CLOUDINARY_VIDEO_URL =
   "https://player.cloudinary.com/embed/?cloud_name=dl9zkv77&public_id=2e39652c-6c4f-4c82-94a4-8b982d3ce785_m2vatb";
 
 const SECTION_BACKGROUND_IMAGE =
-  "/images/featured-sectio-bg.webp";
+  "/images/COVAH The Cavern.webp";
 
 const VIDEO_COVER_IMAGE =
   "/images/COVAH The Cavern.webp";

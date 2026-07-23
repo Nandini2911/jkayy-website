@@ -33,7 +33,7 @@ const menuItems: MenuItem[] = [
     roman: "III",
     label: "Events",
     description: "Upcoming shows and appearances",
-    href: "#events",
+    href: "/events",
     image: "/menu/events.webp",
   },
   {

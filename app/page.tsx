@@ -1,5 +1,6 @@
 import Footer from "@/components/common/Footer";
 import Navbar from "@/components/common/Navbar";
+import TheArtistSection from "@/components/sections/About/TheArtistsection";
 import BehindTheDecksSection from "@/components/sections/home/BehindTheDeckssection";
 import BookJkayySection from "@/components/sections/home/BookJKAYYCTA";
 import FeaturedPerformanceReel from "@/components/sections/home/FeaturedPerformanceReel";
