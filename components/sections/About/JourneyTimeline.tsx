@@ -48,7 +48,7 @@ const milestones: JourneyMilestone[] = [
     category: "Creating Sound",
     description:
       "The journey moved beyond playing music into building original sound, emotion and atmosphere.",
-    image: "/images/journey/music-production.webp",
+    image: "",
     imagePosition: "center",
     accent: "98, 210, 255",
   },

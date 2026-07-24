@@ -40,14 +40,14 @@ const menuItems: MenuItem[] = [
     roman: "IV",
     label: "Gallery",
     description: "Moments beyond the stage",
-    href: "#gallery",
+    href: "/gallery",
     image: "/menu/gallery.webp",
   },
   {
     roman: "V",
     label: "Music",
     description: "Latest tracks and releases",
-    href: "#music",
+    href: "/music",
     image: "/menu/music.webp",
   },
   {

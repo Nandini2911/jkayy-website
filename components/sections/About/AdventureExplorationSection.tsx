@@ -33,8 +33,7 @@ const cleanFont = Manrope({
 
 const ADVENTURE_VIDEO = "https://res.cloudinary.com/dl9zkv77/video/upload/v1784792580/jkayyofficial_7_raupph.mp4";
 
-const ADVENTURE_POSTER =
-  "/images/adventure/adventure-poster.webp";
+
 
 /*
   This video appears behind the continuously scrolling image gallery.
@@ -44,8 +43,6 @@ const ADVENTURE_POSTER =
 const GALLERY_BACKGROUND_VIDEO =
   "https://res.cloudinary.com/dl9zkv77/video/upload/v1784791995/adventure-drone_lkd1aj.mp4";
 
-const GALLERY_BACKGROUND_POSTER =
-  "/images/adventure/adventure-poster.webp";
 
 type AdventureGalleryItem = {
   number: string;
@@ -677,7 +674,7 @@ export default function AdventureExplorationSection() {
           playsInline
           autoPlay={!reduceMotion}
           preload="metadata"
-          poster={ADVENTURE_POSTER}
+        
           disablePictureInPicture
           disableRemotePlayback
           controlsList="nodownload noremoteplayback"
@@ -1000,7 +997,7 @@ export default function AdventureExplorationSection() {
           playsInline
           autoPlay={!reduceMotion}
           preload="metadata"
-          poster={GALLERY_BACKGROUND_POSTER}
+    
           disablePictureInPicture
           disableRemotePlayback
           controlsList="nodownload noremoteplayback"
