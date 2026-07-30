@@ -11,6 +11,7 @@ import {
   Cormorant_Garamond,
   Manrope,
 } from "next/font/google";
+import Link from "next/link";
 import { useRef } from "react";
 
 const luxuryFont = Cormorant_Garamond({
@@ -108,6 +109,7 @@ export default function JKAYYQuoteSection() {
   const firstLineDelay = 0.08;
   const secondLineDelay = 0.18;
   const authorDelay = 0.38;
+  const buttonDelay = 0.52;
 
   return (
     <LazyMotion features={domAnimation} strict>
@@ -316,6 +318,81 @@ export default function JKAYYQuoteSection() {
                   "linear-gradient(90deg, rgba(255,255,255,0.42), transparent)",
               }}
             />
+          </m.div>
+
+          {/* MUSIC PAGE BUTTON */}
+          <m.div
+            initial={false}
+            animate={
+              showContent
+                ? {
+                    opacity: 1,
+                    y: 0,
+                  }
+                : {
+                    opacity: 0,
+                    y: 14,
+                  }
+            }
+            transition={{
+              duration: reduceMotion ? 0 : 0.55,
+              delay: reduceMotion ? 0 : buttonDelay,
+              ease: SMOOTH_EASE,
+            }}
+            style={{
+              marginTop: "clamp(28px, 4vw, 46px)",
+            }}
+          >
+            <Link
+              href="/music"
+              aria-label="Explore JKAYY music"
+              style={{
+                position: "relative",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "14px",
+                minHeight: "48px",
+                padding: "0 24px",
+                overflow: "hidden",
+                border: "1px solid rgba(255,255,255,0.22)",
+                borderRadius: "999px",
+                color: "#ffffff",
+                background: "rgba(255,255,255,0.04)",
+                boxShadow:
+                  "inset 0 1px 0 rgba(255,255,255,0.08)",
+                fontFamily: cleanFont.style.fontFamily,
+                fontSize: "9px",
+                fontWeight: 600,
+                letterSpacing: "0.26em",
+                textDecoration: "none",
+                textTransform: "uppercase",
+                backdropFilter: "blur(10px)",
+                WebkitBackdropFilter: "blur(10px)",
+                transition:
+                  "background 280ms ease, border-color 280ms ease, transform 280ms cubic-bezier(0.16,1,0.3,1)",
+              }}
+              onMouseEnter={(event) => {
+                event.currentTarget.style.background = "#ffffff";
+                event.currentTarget.style.color = "#070505";
+                event.currentTarget.style.borderColor = "#ffffff";
+                event.currentTarget.style.transform = "translateY(-2px)";
+              }}
+              onMouseLeave={(event) => {
+                event.currentTarget.style.background =
+                  "rgba(255,255,255,0.04)";
+                event.currentTarget.style.color = "#ffffff";
+                event.currentTarget.style.borderColor =
+                  "rgba(255,255,255,0.22)";
+                event.currentTarget.style.transform = "translateY(0)";
+              }}
+            >
+              Explore Music
+
+             
+              
+           
+            </Link>
           </m.div>
         </m.div>
       </section>

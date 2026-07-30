@@ -335,7 +335,6 @@ export default function HeroSection() {
       >
         {audioEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
 
-        <span>{audioEnabled ? "Sound on" : "Tap for sound"}</span>
       </button>
     </section>
   );

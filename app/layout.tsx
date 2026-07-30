@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Michroma } from "next/font/google";
 import "./globals.css";
+import FloatingSocialButtons from "@/components/common/FloatingSocialButtons";
 
 const michroma = Michroma({
   subsets: ["latin"],
@@ -30,6 +31,9 @@ export default function RootLayout({
         className={`${michroma.variable} bg-[#050505] text-white antialiased`}
       >
         {children}
+
+
+  <FloatingSocialButtons />
       </body>
     </html>
   );

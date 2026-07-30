@@ -1461,6 +1461,7 @@ export default function AboutSection() {
             whileTap={{
               scale: 0.98,
             }}
+            className="group relative overflow-hidden"
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -1497,6 +1498,15 @@ export default function AboutSection() {
               WebkitBackdropFilter: "blur(10px)",
             }}
           >
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-active:opacity-100"
+              style={{
+                background:
+                  "radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 42%, #d6249f 62%, #285AEB 92%)",
+              }}
+            />
+
             <svg
               aria-hidden="true"
               viewBox="0 0 24 24"
@@ -1505,6 +1515,8 @@ export default function AboutSection() {
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
               style={{
+                position: "relative",
+                zIndex: 1,
                 display: "block",
                 flex: "0 0 auto",
               }}
@@ -1535,7 +1547,14 @@ export default function AboutSection() {
               />
             </svg>
 
-            Follow on Instagram
+            <span
+              style={{
+                position: "relative",
+                zIndex: 1,
+              }}
+            >
+              Follow on Instagram
+            </span>
           </motion.a>
         </motion.div>
       </div>
