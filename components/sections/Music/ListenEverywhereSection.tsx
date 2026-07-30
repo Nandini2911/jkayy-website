@@ -30,6 +30,38 @@ const bodyFont = Manrope({
 
 const premiumEase = [0.16, 1, 0.3, 1] as const;
 
+
+/*
+  Paste the direct "Echoes Of Night" song URL for each platform below.
+  Every platform card in this section uses this single link map.
+*/
+const platformLinks: Record<string, string> = {
+  Spotify: "https://open.spotify.com/track/5IVkBMMh6hgRvvEpwXEX1t?si=-hK74JkxTR682C5IPXje_A&utm_source=copy-link",
+  "Apple Music": "https://music.apple.com/us/album/keep-them-close-single/6769612576",
+  "YouTube Music": "https://music.youtube.com/watch?v=MnleUnPcF7g&si=jhdd4fQThmlwo61u",
+  "Amazon Music": "https://music.amazon.in/tracks/B0H1QHMCXJ?marketplaceId=A21TJRUUN4KGV&musicTerritory=IN&ref=dm_sh_eNdDvKZa8EMwQQDqV2IVoedKI",
+  JioSaavn: "",
+  Deezer: "",
+  iTunes: "",
+  Instagram: "",
+  TikTok: "",
+  Pandora: "",
+  TIDAL: "",
+  iHeartRadio: "",
+  Qobuz: "https://www.qobuz.com/us-en/album/keep-them-close-jkayy/xw9t48qgfg70x",
+  Boomplay: "",
+  Anghami: "",
+  "NetEase Music": "https://music.youtube.com/watch?v=MnleUnPcF7g&si=64tgQImMzKp2vNpB",
+  "Tencent Music": "",
+  "Kuack Media": "",
+  KKBOX: "",
+  "7digital": "",
+  Adaptr: "",
+  FLO: "",
+  MediaNet: "",
+};
+
+
 type Platform = {
   name: string;
   code: string;
@@ -482,9 +514,16 @@ export default function ListenEverywhereSection() {
               >
                 {row.map((platform, itemIndex) => {
                   return (
-                    <motion.button
+                    <motion.a
                       key={platform.name}
-                      type="button"
+                      href={platformLinks[platform.name] || undefined}
+                      target={platformLinks[platform.name] ? "_blank" : undefined}
+                      rel={platformLinks[platform.name] ? "noopener noreferrer" : undefined}
+                      aria-label={
+                        platformLinks[platform.name]
+                          ? `Listen to Echoes Of Night on ${platform.name}`
+                          : `${platform.name} song link not added yet`
+                      }
                       whileHover={
                         reducedMotion
                           ? undefined
@@ -549,7 +588,7 @@ export default function ListenEverywhereSection() {
 
                       {/* Animated bottom line */}
                       <span className="pointer-events-none absolute bottom-0 left-0 h-px w-0 bg-black transition-all duration-700 group-hover:w-full group-hover:bg-white" />
-                    </motion.button>
+                    </motion.a>
                   );
                 })}
               </motion.div>
@@ -723,8 +762,16 @@ export default function ListenEverywhereSection() {
               <div className="overflow-y-auto overscroll-contain p-3 sm:p-5 lg:p-8">
                 <div className="grid grid-cols-1 gap-px overflow-hidden border border-black/[0.1] bg-black/[0.1] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {platforms.map((platform, index) => (
-                    <motion.div
+                    <motion.a
                       key={platform.name}
+                      href={platformLinks[platform.name] || undefined}
+                      target={platformLinks[platform.name] ? "_blank" : undefined}
+                      rel={platformLinks[platform.name] ? "noopener noreferrer" : undefined}
+                      aria-label={
+                        platformLinks[platform.name]
+                          ? `Listen to Echoes Of Night on ${platform.name}`
+                          : `${platform.name} song link not added yet`
+                      }
                       initial={{
                         opacity: 0,
                         y: 20,
@@ -791,7 +838,7 @@ export default function ListenEverywhereSection() {
                           "0",
                         )}
                       </span>
-                    </motion.div>
+                    </motion.a>
                   ))}
                 </div>
               </div>
