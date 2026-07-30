@@ -2,9 +2,11 @@
   "name": "ultra-dark-website",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "dev": "next dev --webpack"
-  },
+ "scripts": {
+  "dev": "next dev --webpack",
+  "build": "next build",
+  "start": "next start"
+},
   "dependencies": {
     "@gsap/react": "^2.1.2",
     "@react-three/drei": "^10.7.7",

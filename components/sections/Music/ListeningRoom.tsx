@@ -35,7 +35,7 @@ const cleanFont = Manrope({
 
 const premiumEase = [0.16, 1, 0.3, 1] as const;
 
-const AUDIO_SRC = "/audio/keep them close.mp3";
+const AUDIO_SRC = "/audio/keep-them-close.mp3";
 const AUDIO_VOLUME = 0.34;
 
 
