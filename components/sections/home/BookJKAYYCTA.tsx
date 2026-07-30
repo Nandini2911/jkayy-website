@@ -41,7 +41,7 @@ const eventTypes = [
 ];
 
 const WHATSAPP_NUMBER =
-  "917517848682";
+  "919372992720";
 
 export default function BookJkayySection() {
   const reduceMotion = useReducedMotion();
