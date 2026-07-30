@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import {
   motion,
   type Variants,
@@ -17,16 +18,22 @@ const contacts = [
     title: "Bookings",
     value: "bookings@jkayy.com",
     href: "mailto:bookings@jkayy.com",
+    image: "/images/contact1.jpeg",
+    imageAlt: "JKAYY live performance booking",
   },
   {
     title: "Phone",
     value: "+91 XXXXX XXXXX",
     href: "tel:+91XXXXXXXXXX",
+    image: "/images/contact2.jpeg",
+    imageAlt: "JKAYY live club performance",
   },
   {
     title: "Based In",
     value: "Delhi",
     secondary: "Available Worldwide",
+    image: "/images/contact3.jpeg",
+    imageAlt: "JKAYY artist portrait",
   },
 ];
 
@@ -38,11 +45,11 @@ function createCardVariants(
       opacity: 0,
       x:
         index === 0
-          ? -55
+          ? -48
           : index === 2
-            ? 55
+            ? 48
             : 0,
-      y: index === 1 ? 45 : 0,
+      y: index === 1 ? 34 : 0,
     },
 
     visible: {
@@ -51,26 +58,23 @@ function createCardVariants(
       y: 0,
 
       transition: {
-        delay: index * 0.13,
-        duration: 0.9,
+        delay: index * 0.1,
+        duration: 0.7,
         ease,
       },
     },
 
     hover: {
-      y: -10,
+      y: -7,
 
       borderColor:
-        "rgba(255,255,255,0.30)",
-
-      background:
-        "linear-gradient(145deg, rgba(255,255,255,0.085), transparent 62%), rgba(255,255,255,0.026)",
+        "rgba(255,255,255,0.28)",
 
       boxShadow:
-        "0 28px 75px rgba(0,0,0,0.38), 0 0 42px rgba(255,248,230,0.035)",
+        "0 26px 70px rgba(0,0,0,0.38)",
 
       transition: {
-        duration: 0.45,
+        duration: 0.35,
         ease,
       },
     },
@@ -89,33 +93,11 @@ const arrowVariants: Variants = {
   },
 
   hover: {
-    x: 5,
-    y: -5,
+    x: 4,
+    y: -4,
 
     transition: {
-      duration: 0.4,
-      ease,
-    },
-  },
-};
-
-const reflectionVariants: Variants = {
-  hidden: {
-    x: "-180%",
-    opacity: 0,
-  },
-
-  visible: {
-    x: "-180%",
-    opacity: 0,
-  },
-
-  hover: {
-    x: "320%",
-    opacity: [0, 0.75, 0],
-
-    transition: {
-      duration: 1,
+      duration: 0.3,
       ease,
     },
   },
@@ -124,21 +106,11 @@ const reflectionVariants: Variants = {
 const cardStyle: CSSProperties = {
   position: "relative",
   overflow: "hidden",
-  minHeight: "330px",
 
   border:
     "1px solid rgba(255,255,255,0.13)",
 
-  display: "flex",
-  flexDirection: "column",
-  justifyContent: "space-between",
-
-  padding: "25px",
-
-  background:
-    "linear-gradient(145deg, rgba(255,255,255,0.05), transparent 60%), rgba(255,255,255,0.018)",
-
-  backdropFilter: "blur(17px)",
+  background: "#090909",
   boxSizing: "border-box",
 };
 
@@ -150,13 +122,16 @@ export default function DirectContactSection() {
         position: "relative",
         zIndex: 1,
         width: "100%",
-        minHeight: "105vh",
+        minHeight: "100svh",
 
         display: "flex",
         alignItems: "center",
 
-        padding: "16vh 5vw",
+        padding:
+          "clamp(72px, 14vh, 150px) clamp(18px, 5vw, 80px)",
+
         boxSizing: "border-box",
+        overflow: "hidden",
       }}
     >
       <div
@@ -168,7 +143,7 @@ export default function DirectContactSection() {
         <motion.header
           initial={{
             opacity: 0,
-            y: 30,
+            y: 24,
           }}
           whileInView={{
             opacity: 1,
@@ -176,10 +151,10 @@ export default function DirectContactSection() {
           }}
           viewport={{
             once: true,
-            amount: 0.5,
+            amount: 0.35,
           }}
           transition={{
-            duration: 0.8,
+            duration: 0.65,
             ease,
           }}
           style={{
@@ -188,8 +163,9 @@ export default function DirectContactSection() {
             alignItems: "flex-end",
             justifyContent: "space-between",
 
-            gap: "20px 30px",
-            marginBottom: "62px",
+            gap: "16px 30px",
+            marginBottom:
+              "clamp(34px, 5vw, 62px)",
           }}
         >
           <p
@@ -220,136 +196,266 @@ export default function DirectContactSection() {
         </motion.header>
 
         <div
-          style={{
-            display: "grid",
-
-            gridTemplateColumns:
-              "repeat(auto-fit, minmax(min(100%, 300px), 1fr))",
-
-            gap: "18px",
-          }}
+          className="
+            grid
+            grid-cols-1
+            gap-[18px]
+            md:grid-cols-2
+            xl:grid-cols-3
+          "
         >
-          {contacts.map((contact, index) => {
-            const cardContent = (
-              <>
-                <small
-                  style={{
-                    color:
-                      "rgba(255,255,255,0.28)",
-
-                    fontSize: "9px",
-                    letterSpacing: "0.18em",
-                  }}
-                >
-                  0{index + 1}
-                </small>
-
-                <div>
-                  <p
-                    style={{
-                      margin: "0 0 14px",
-
-                      color:
-                        "rgba(255,255,255,0.39)",
-
-                      fontSize: "9px",
-                      letterSpacing: "0.25em",
-                      textTransform: "uppercase",
-                    }}
+          {contacts.map(
+            (contact, index) => {
+              const cardContent = (
+                <>
+                  {/* IMAGE AREA */}
+                  <div
+                    className="
+                      group/image
+                      relative
+                      aspect-[16/10]
+                      w-full
+                      overflow-hidden
+                      bg-[#111]
+                      sm:aspect-[16/9]
+                      xl:aspect-[16/10]
+                    "
                   >
-                    {contact.title}
-                  </p>
+                    <Image
+                      src={contact.image}
+                      alt={contact.imageAlt}
+                      fill
+                      sizes="
+                        (max-width: 767px) 100vw,
+                        (max-width: 1279px) 50vw,
+                        33vw
+                      "
+                      className="
+                        object-cover
+                        object-center
+                        transition-transform
+                        duration-700
+                        ease-[cubic-bezier(0.16,1,0.3,1)]
+                        group-hover/image:scale-[1.04]
+                      "
+                    />
 
-                  <h3
-                    style={{
-                      margin: 0,
-                      overflowWrap: "anywhere",
+                    <div
+                      className="
+                        pointer-events-none
+                        absolute
+                        inset-0
+                        bg-[linear-gradient(180deg,rgba(0,0,0,0.02)_0%,rgba(0,0,0,0.08)_55%,rgba(0,0,0,0.62)_100%)]
+                      "
+                    />
 
-                      fontFamily:
-                        "Cormorant Garamond, Times New Roman, serif",
-
-                      fontSize:
-                        "clamp(29px, 2.45vw, 43px)",
-
-                      fontWeight: 400,
-                      letterSpacing: "-0.035em",
-                      lineHeight: 1.02,
-                    }}
-                  >
-                    {contact.value}
-                  </h3>
-
-                  {contact.secondary ? (
-                    <span
-                      style={{
-                        display: "block",
-                        marginTop: "10px",
-
-                        color:
-                          "rgba(245,243,237,0.46)",
-
-                        fontSize: "10px",
-                        letterSpacing: "0.17em",
-                        textTransform: "uppercase",
-                      }}
+                    <small
+                      className="
+                        absolute
+                        left-5
+                        top-5
+                        z-10
+                        text-[8px]
+                        tracking-[0.18em]
+                        text-white/55
+                      "
                     >
-                      {contact.secondary}
-                    </span>
-                  ) : null}
-                </div>
+                      0{index + 1}
+                    </small>
+                  </div>
 
-                {contact.href ? (
-                  <motion.b
-                    variants={arrowVariants}
-                    style={{
-                      position: "absolute",
-                      top: "22px",
-                      right: "25px",
-
-                      fontSize: "20px",
-                      fontWeight: 400,
-                    }}
+                  {/* CONTENT AREA */}
+                  <div
+                    className="
+                      relative
+                      flex
+                      min-h-[190px]
+                      flex-col
+                      justify-between
+                      p-5
+                      sm:min-h-[210px]
+                      sm:p-6
+                      xl:min-h-[220px]
+                    "
                   >
-                    ↗
-                  </motion.b>
-                ) : null}
+                    <div>
+                      <p
+                        style={{
+                          margin:
+                            "0 0 12px",
 
-                <motion.i
-                  variants={reflectionVariants}
-                  aria-hidden="true"
-                  style={{
-                    position: "absolute",
-                    top: "-20%",
-                    left: 0,
+                          color:
+                            "rgba(255,255,255,0.39)",
 
-                    display: "block",
+                          fontSize:
+                            "9px",
+                          letterSpacing:
+                            "0.25em",
+                          textTransform:
+                            "uppercase",
+                        }}
+                      >
+                        {contact.title}
+                      </p>
 
-                    width: "42%",
-                    height: "150%",
+                      <h3
+                        style={{
+                          margin: 0,
+                          overflowWrap:
+                            "anywhere",
 
-                    transform: "rotate(18deg)",
+                          fontFamily:
+                            "Cormorant Garamond, Times New Roman, serif",
 
-                    background:
-                      "linear-gradient(90deg, transparent, rgba(255,255,255,0.075), transparent)",
+                          fontSize:
+                            "clamp(28px, 2.4vw, 43px)",
 
-                    pointerEvents: "none",
-                  }}
-                />
-              </>
-            );
+                          fontWeight: 400,
+                          letterSpacing:
+                            "-0.035em",
+                          lineHeight: 1.02,
+                        }}
+                      >
+                        {contact.value}
+                      </h3>
 
-            return (
-              <ContactCard
-                key={contact.title}
-                href={contact.href}
-                variants={createCardVariants(
-                  index,
-                )}
-              >
-                {cardContent}
-              </ContactCard>
-            );
-          })}
+                      {contact.secondary ? (
+                        <span
+                          style={{
+                            display:
+                              "block",
+                            marginTop:
+                              "10px",
+
+                            color:
+                              "rgba(245,243,237,0.46)",
+
+                            fontSize:
+                              "10px",
+                            letterSpacing:
+                              "0.17em",
+                            textTransform:
+                              "uppercase",
+                          }}
+                        >
+                          {
+                            contact.secondary
+                          }
+                        </span>
+                      ) : null}
+                    </div>
+
+                    <div
+                      className="
+                        mt-6
+                        flex
+                        items-center
+                        justify-between
+                        border-t
+                        border-white/[0.08]
+                        pt-4
+                      "
+                    >
+                      <span
+                        className="
+                          text-[7px]
+                          uppercase
+                          tracking-[0.22em]
+                          text-white/25
+                        "
+                      >
+                        Direct Contact
+                      </span>
+
+                      {contact.href ? (
+                        <motion.b
+                          variants={
+                            arrowVariants
+                          }
+                          style={{
+                            fontSize:
+                              "20px",
+                            fontWeight: 400,
+                          }}
+                        >
+                          ↗
+                        </motion.b>
+                      ) : (
+                        <span
+                          className="
+                            text-[8px]
+                            uppercase
+                            tracking-[0.2em]
+                            text-white/30
+                          "
+                        >
+                          Worldwide
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* subtle reflection */}
+                  <motion.i
+                    aria-hidden="true"
+                    initial={{
+                      x: "-180%",
+                      opacity: 0,
+                    }}
+                    whileHover={{
+                      x: "330%",
+                      opacity: [
+                        0,
+                        0.5,
+                        0,
+                      ],
+                    }}
+                    transition={{
+                      duration: 0.85,
+                      ease,
+                    }}
+                    style={{
+                      position:
+                        "absolute",
+                      top: "-20%",
+                      left: 0,
+
+                      display:
+                        "block",
+
+                      width: "34%",
+                      height: "150%",
+
+                      transform:
+                        "rotate(18deg)",
+
+                      background:
+                        "linear-gradient(90deg, transparent, rgba(255,255,255,0.055), transparent)",
+
+                      pointerEvents:
+                        "none",
+                    }}
+                  />
+                </>
+              );
+
+              return (
+                <ContactCard
+                  key={
+                    contact.title
+                  }
+                  href={
+                    contact.href
+                  }
+                  variants={createCardVariants(
+                    index,
+                  )}
+                >
+                  {cardContent}
+                </ContactCard>
+              );
+            },
+          )}
         </div>
       </div>
     </section>
@@ -375,7 +481,7 @@ function ContactCard({
         whileHover="hover"
         viewport={{
           once: true,
-          amount: 0.35,
+          amount: 0.22,
         }}
         style={{
           ...cardStyle,
@@ -396,9 +502,12 @@ function ContactCard({
       whileHover="hover"
       viewport={{
         once: true,
-        amount: 0.35,
+        amount: 0.22,
       }}
-      style={cardStyle}
+      style={{
+        ...cardStyle,
+        color: "#f5f3ed",
+      }}
     >
       {children}
     </motion.article>

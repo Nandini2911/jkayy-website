@@ -14,6 +14,9 @@ const lines = [
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
+const BACKGROUND_IMAGE =
+  "/images/contact4.jpeg";
+
 type ArrivalSectionProps = {
   heroStyle?: MotionStyle;
 };
@@ -35,10 +38,64 @@ export default function ArrivalSection({
           padding: "120px 6vw 70px",
           transformOrigin: "center top",
           boxSizing: "border-box",
+          overflow: "hidden",
           ...(heroStyle ?? {}),
         } as MotionStyle
       }
     >
+      {/* Background image */}
+      <motion.div
+        initial={{
+          opacity: 0,
+          scale: 1.05,
+        }}
+        animate={{
+          opacity: 1,
+          scale: 1,
+        }}
+        transition={{
+          duration: 1.4,
+          ease,
+        }}
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 0,
+          backgroundImage: `url("${BACKGROUND_IMAGE}")`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          willChange: "transform",
+        }}
+      />
+
+      {/* Dark cinematic overlay */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 1,
+          background:
+            "linear-gradient(180deg, rgba(0,0,0,0.52) 0%, rgba(0,0,0,0.28) 42%, rgba(0,0,0,0.68) 100%)",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Soft center vignette */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 1,
+          background:
+            "radial-gradient(circle at center, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.2) 48%, rgba(0,0,0,0.62) 100%)",
+          pointerEvents: "none",
+        }}
+      />
+
       <div
         style={{
           position: "relative",
@@ -63,7 +120,7 @@ export default function ArrivalSection({
           }}
           style={{
             margin: 0,
-            color: "rgba(245,243,237,0.48)",
+            color: "rgba(245,243,237,0.60)",
             fontSize: "10px",
             fontWeight: 500,
             letterSpacing: "0.33em",
@@ -85,6 +142,8 @@ export default function ArrivalSection({
             fontWeight: 400,
             letterSpacing: "-0.055em",
             lineHeight: 0.82,
+            textShadow:
+              "0 6px 35px rgba(0,0,0,0.34)",
           }}
         >
           {lines.map((line, index) => (
@@ -109,7 +168,7 @@ export default function ArrivalSection({
                 display: "block",
                 color:
                   index === 1
-                    ? "rgba(245,243,237,0.82)"
+                    ? "rgba(245,243,237,0.84)"
                     : "#f5f3ed",
                 fontStyle:
                   index === 1
@@ -138,7 +197,7 @@ export default function ArrivalSection({
             flexWrap: "wrap",
             justifyContent: "center",
             gap: "12px 24px",
-            color: "rgba(245,243,237,0.44)",
+            color: "rgba(245,243,237,0.56)",
             fontSize: "9px",
             letterSpacing: "0.2em",
             lineHeight: 1.6,
@@ -196,6 +255,7 @@ export default function ArrivalSection({
         aria-hidden="true"
         style={{
           position: "absolute",
+          zIndex: 2,
           bottom: "30px",
           left: "50%",
           display: "flex",
@@ -203,7 +263,7 @@ export default function ArrivalSection({
           alignItems: "center",
           gap: "10px",
           transform: "translateX(-50%)",
-          color: "rgba(255,255,255,0.35)",
+          color: "rgba(255,255,255,0.45)",
           fontSize: "8px",
           letterSpacing: "0.3em",
           textTransform: "uppercase",
