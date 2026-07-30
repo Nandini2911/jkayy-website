@@ -54,7 +54,7 @@ const menuItems: MenuItem[] = [
     roman: "VI",
     label: "Contact",
     description: "Bookings and collaborations",
-    href: "#contact",
+    href: "/contact",
     image: "/menu/contact.webp",
   },
 ];

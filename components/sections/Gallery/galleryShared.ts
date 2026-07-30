@@ -72,7 +72,7 @@ export const galleryImages: GalleryMediaItem[] = [
   {
     type: "video",
     src: "https://res.cloudinary.com/dl9zkv77/video/upload/v1784724758/jkayyofficial_12_w4nzbe.mp4",
-    poster: "",
+    poster:"poster_img",
     alt: "JKAYY live performance reel",
     label: "Live Reel",
   },
@@ -112,7 +112,7 @@ export const galleryImages: GalleryMediaItem[] = [
   {
     type: "video",
     src: "https://res.cloudinary.com/dl9zkv77/video/upload/v1784805159/hy.press_eqtxj2.mp4",
-    poster: "",
+   poster:"poster_img",
     alt: "JKAYY performing under stage lights",
     label: "Performance Film",
   },
@@ -120,7 +120,7 @@ export const galleryImages: GalleryMediaItem[] = [
   {
     type: "video",
     src: "https://res.cloudinary.com/dl9zkv77/video/upload/v1784537173/jkayyofficial_2_h963q1.mp4",
-    poster:"",
+    poster:"poster_img",
     alt: "JKAYY performing under stage lights",
     label: "Live Performance",
   },
@@ -133,28 +133,28 @@ export const galleryImages: GalleryMediaItem[] = [
   {
     type: "video",
     src: "https://res.cloudinary.com/dl9zkv77/video/upload/v1784724961/jkayyofficial_14_odimnt.mp4",
-    poster:"",
+  poster:"poster_img",
     alt: "Close view of JKAYY at the decks",
     label: "Behind The Decks",
   },
   {
     type: "video",
     src: "https://res.cloudinary.com/dl9zkv77/video/upload/v1784792815/reels__1784541648840_ola4l6.mp4",
-    poster:"",
+    poster:"poster_img",
     alt: "Backstage portrait of JKAYY",
     label: "Backstage",
   },
   {
     type: "video",
     src: "https://res.cloudinary.com/dl9zkv77/video/upload/v1784537175/jkayyofficial_4_sdexiy.mp4",
-    poster:"",
+    poster:"poster_img",
     alt: "JKAYY travelling for a show",
     label: "Travel",
   },
   {
     type: "video",
     src: "https://res.cloudinary.com/dl9zkv77/video/upload/v1784791995/adventure-drone_lkd1aj.mp4",
-    poster:"",
+    poster:"poster_img",
     alt: "Backstage portrait of JKAYY",
     label: "Backstage",
   },
@@ -163,7 +163,7 @@ export const galleryImages: GalleryMediaItem[] = [
   {
     type: "video",
     src: "https://res.cloudinary.com/dl9zkv77/video/upload/v1784635508/jkayyofficial_9_fyhuq8.mp4",
-    poster: "",
+    poster:"poster_img",
     alt: "A backstage JKAYY video moment",
     label: "Backstage Film",
   },

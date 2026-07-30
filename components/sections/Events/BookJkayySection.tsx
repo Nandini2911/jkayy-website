@@ -3,6 +3,7 @@
 import { ArrowUpRight } from "lucide-react";
 import {
   motion,
+  useInView,
   useMotionValue,
   useReducedMotion,
   useSpring,
@@ -13,7 +14,9 @@ import {
 } from "next/font/google";
 import {
   type MouseEvent,
+  useEffect,
   useRef,
+  useState,
 } from "react";
 
 const luxuryFont = Cormorant_Garamond({
@@ -31,39 +34,75 @@ const cleanFont = Manrope({
 
 const premiumEase = [0.16, 1, 0.3, 1] as const;
 
-function MagneticBookButton() {
-  const buttonRef =
-    useRef<HTMLAnchorElement | null>(null);
+function useFinePointer() {
+  const [finePointer, setFinePointer] = useState(false);
 
-  const shouldReduceMotion =
-    useReducedMotion();
+  useEffect(() => {
+    const media = window.matchMedia("(hover: hover) and (pointer: fine)");
+
+    const update = () => setFinePointer(media.matches);
+    update();
+
+    if (media.addEventListener) {
+      media.addEventListener("change", update);
+      return () => media.removeEventListener("change", update);
+    }
+
+    media.addListener(update);
+    return () => media.removeListener(update);
+  }, []);
+
+  return finePointer;
+}
+
+function MagneticBookButton() {
+  const buttonRef = useRef<HTMLAnchorElement | null>(null);
+  const boundsRef = useRef<DOMRect | null>(null);
+  const rafRef = useRef<number | null>(null);
+
+  const shouldReduceMotion = useReducedMotion();
+  const finePointer = useFinePointer();
 
   const magneticX = useMotionValue(0);
   const magneticY = useMotionValue(0);
 
   const x = useSpring(magneticX, {
-    stiffness: 190,
-    damping: 17,
-    mass: 0.35,
+    stiffness: 220,
+    damping: 24,
+    mass: 0.22,
   });
 
   const y = useSpring(magneticY, {
-    stiffness: 190,
-    damping: 17,
-    mass: 0.35,
+    stiffness: 220,
+    damping: 24,
+    mass: 0.22,
   });
+
+  useEffect(() => {
+    return () => {
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+      }
+    };
+  }, []);
+
+  const handleMouseEnter = () => {
+    boundsRef.current = buttonRef.current?.getBoundingClientRect() ?? null;
+  };
 
   const handleMouseMove = (
     event: MouseEvent<HTMLAnchorElement>,
   ) => {
     if (
       shouldReduceMotion ||
+      !finePointer ||
       !buttonRef.current
     ) {
       return;
     }
 
     const bounds =
+      boundsRef.current ??
       buttonRef.current.getBoundingClientRect();
 
     const relativeX =
@@ -76,11 +115,18 @@ function MagneticBookButton() {
       bounds.top -
       bounds.height / 2;
 
-    magneticX.set(relativeX * 0.2);
-    magneticY.set(relativeY * 0.2);
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+    }
+
+    rafRef.current = requestAnimationFrame(() => {
+      magneticX.set(relativeX * 0.14);
+      magneticY.set(relativeY * 0.14);
+    });
   };
 
   const resetPosition = () => {
+    boundsRef.current = null;
     magneticX.set(0);
     magneticY.set(0);
   };
@@ -89,6 +135,7 @@ function MagneticBookButton() {
     <motion.a
       ref={buttonRef}
       href="#contact"
+      onMouseEnter={handleMouseEnter}
       onMouseMove={handleMouseMove}
       onMouseLeave={resetPosition}
       style={{
@@ -97,13 +144,14 @@ function MagneticBookButton() {
         fontFamily: cleanFont.style.fontFamily,
       }}
       whileTap={{
-        scale: 0.96,
+        scale: 0.97,
       }}
       className="
         group
         relative
         inline-flex
-        min-w-[190px]
+        min-h-12
+        min-w-[170px]
         items-center
         justify-center
         overflow-hidden
@@ -111,21 +159,23 @@ function MagneticBookButton() {
         border
         border-white
         bg-white
-        px-8
-        py-4
-        text-[10px]
+        px-6
+        py-3.5
+        text-[9px]
         font-semibold
         uppercase
-        tracking-[0.28em]
+        tracking-[0.24em]
         text-black
-        shadow-[0_20px_65px_rgba(255,255,255,0.12)]
-        transition-shadow
-        duration-500
-        hover:shadow-[0_25px_90px_rgba(255,255,255,0.26)]
-        sm:min-w-[220px]
-        sm:px-10
-        sm:py-5
-        sm:text-[11px]
+        shadow-[0_16px_44px_rgba(255,255,255,0.10)]
+        transition-[box-shadow,transform]
+        duration-300
+        hover:shadow-[0_18px_54px_rgba(255,255,255,0.18)]
+        sm:min-w-[200px]
+        sm:px-8
+        sm:py-4
+        sm:text-[10px]
+        md:min-w-[220px]
+        md:text-[11px]
       "
     >
       <span
@@ -137,7 +187,7 @@ function MagneticBookButton() {
           scale-y-0
           bg-[#161616]
           transition-transform
-          duration-500
+          duration-300
           ease-out
           group-hover:scale-y-100
         "
@@ -149,9 +199,9 @@ function MagneticBookButton() {
           z-10
           flex
           items-center
-          gap-4
+          gap-3
           transition-colors
-          duration-500
+          duration-300
           group-hover:text-white
         "
       >
@@ -162,9 +212,9 @@ function MagneticBookButton() {
           strokeWidth={1.7}
           className="
             transition-transform
-            duration-500
-            group-hover:translate-x-1
-            group-hover:-translate-y-1
+            duration-300
+            group-hover:translate-x-0.5
+            group-hover:-translate-y-0.5
           "
         />
       </span>
@@ -173,220 +223,123 @@ function MagneticBookButton() {
 }
 
 export default function BookJkayySection() {
-  const shouldReduceMotion =
-    useReducedMotion();
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const shouldReduceMotion = useReducedMotion();
+
+  const isInView = useInView(sectionRef, {
+    margin: "180px 0px 180px 0px",
+    amount: 0.08,
+  });
+
+  const animateDecor =
+    isInView && !shouldReduceMotion;
 
   return (
     <section
+      ref={sectionRef}
       id="book-jkayy"
       className="
         relative
         z-30
         flex
-        min-h-[80svh]
+        min-h-[660px]
         w-full
         items-center
         justify-center
         overflow-hidden
         bg-[#030303]
         px-4
-        py-20
+        py-16
         text-white
-        sm:px-7
+        sm:min-h-[720px]
+        sm:px-6
+        sm:py-18
+        md:px-8
         lg:min-h-[100svh]
         lg:px-10
+        lg:py-16
+        xl:px-12
       "
+      style={{
+        contentVisibility: "auto",
+        containIntrinsicSize: "850px",
+      }}
     >
-      {/* Subtle background grid */}
       <div
         className="
           pointer-events-none
           absolute
           inset-0
-          opacity-[0.035]
+          opacity-[0.025]
           [background-image:linear-gradient(rgba(255,255,255,0.45)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.45)_1px,transparent_1px)]
           [background-size:72px_72px]
         "
       />
 
-      {/* Background vignette */}
       <div
         className="
           pointer-events-none
           absolute
           inset-0
-          bg-[radial-gradient(circle_at_center,transparent_5%,rgba(0,0,0,0.35)_55%,rgba(0,0,0,0.96)_100%)]
+          bg-[radial-gradient(circle_at_center,transparent_8%,rgba(0,0,0,0.34)_58%,rgba(0,0,0,0.96)_100%)]
         "
       />
 
-      {/* Moving spotlight */}
       <motion.div
         aria-hidden="true"
         animate={
-          shouldReduceMotion
-            ? undefined
+          animateDecor
+            ? {
+                x: ["-5%", "5%", "-5%"],
+                opacity: [0.55, 0.88, 0.55],
+              }
             : {
-                x: [
-                  "-60%",
-                  "45%",
-                  "-60%",
-                ],
-                opacity: [
-                  0.18,
-                  0.48,
-                  0.18,
-                ],
+                x: "0%",
+                opacity: 0.55,
               }
         }
-        transition={{
-          duration: 11,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
+        transition={
+          animateDecor
+            ? {
+                duration: 13,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }
+            : {
+                duration: 0.3,
+              }
+        }
         className="
           pointer-events-none
           absolute
           left-1/2
-          top-[10%]
-          h-[100svh]
-          w-[38vw]
-          min-w-[320px]
+          top-[26%]
+          h-[62svh]
+          w-[20vw]
+          min-w-[180px]
+          max-w-[320px]
           -translate-x-1/2
-          -rotate-[12deg]
-          bg-[linear-gradient(to_bottom,rgba(255,255,255,0.16),rgba(255,255,255,0.045)_42%,transparent_78%)]
-          blur-[42px]
+          -rotate-[10deg]
+          bg-[linear-gradient(to_bottom,rgba(255,255,255,0.09),rgba(255,255,255,0.018)_46%,transparent_82%)]
         "
       />
 
-      {/* Spotlight source */}
-      <motion.div
+      <div
         aria-hidden="true"
-        animate={
-          shouldReduceMotion
-            ? undefined
-            : {
-                x: [
-                  "-36vw",
-                  "34vw",
-                  "-36vw",
-                ],
-              }
-        }
-        transition={{
-          duration: 11,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
         className="
           pointer-events-none
           absolute
+          bottom-[-20%]
           left-1/2
-          top-[3%]
-          h-2
-          w-24
+          h-[48vh]
+          w-[90vw]
+          max-w-[1200px]
           -translate-x-1/2
-          rounded-full
-          bg-white/80
-          blur-[2px]
-          shadow-[0_0_30px_rgba(255,255,255,0.65)]
-        "
-      />
-
-      {/* Soft smoke layer one */}
-      <motion.div
-        aria-hidden="true"
-        animate={
-          shouldReduceMotion
-            ? undefined
-            : {
-                x: [
-                  "-12%",
-                  "10%",
-                  "-12%",
-                ],
-                y: [
-                  "4%",
-                  "-8%",
-                  "4%",
-                ],
-                scale: [
-                  1,
-                  1.15,
-                  1,
-                ],
-                opacity: [
-                  0.12,
-                  0.28,
-                  0.12,
-                ],
-              }
-        }
-        transition={{
-          duration: 15,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        className="
-          pointer-events-none
-          absolute
-          bottom-[-18%]
-          left-[-8%]
-          h-[55vh]
-          w-[72vw]
           rounded-[50%]
-          bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.12),rgba(150,150,150,0.04)_45%,transparent_75%)]
-          blur-[70px]
+          bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.07),rgba(140,140,140,0.02)_42%,transparent_75%)]
         "
       />
 
-      {/* Soft smoke layer two */}
-      <motion.div
-        aria-hidden="true"
-        animate={
-          shouldReduceMotion
-            ? undefined
-            : {
-                x: [
-                  "10%",
-                  "-12%",
-                  "10%",
-                ],
-                y: [
-                  "0%",
-                  "-10%",
-                  "0%",
-                ],
-                scale: [
-                  1.08,
-                  0.95,
-                  1.08,
-                ],
-                opacity: [
-                  0.1,
-                  0.23,
-                  0.1,
-                ],
-              }
-        }
-        transition={{
-          duration: 18,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        className="
-          pointer-events-none
-          absolute
-          bottom-[-15%]
-          right-[-15%]
-          h-[60vh]
-          w-[75vw]
-          rounded-[50%]
-          bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.1),rgba(130,130,130,0.035)_46%,transparent_74%)]
-          blur-[85px]
-        "
-      />
-
-      {/* Thin top line */}
       <motion.div
         initial={{
           scaleX: 0,
@@ -396,10 +349,10 @@ export default function BookJkayySection() {
         }}
         viewport={{
           once: true,
-          amount: 0.5,
+          amount: 0.4,
         }}
         transition={{
-          duration: 1.5,
+          duration: 0.7,
           ease: premiumEase,
         }}
         className="
@@ -412,15 +365,16 @@ export default function BookJkayySection() {
           origin-center
           bg-gradient-to-r
           from-transparent
-          via-white/20
+          via-white/18
           to-transparent
-          sm:left-10
-          sm:right-10
-          sm:top-9
+          sm:left-8
+          sm:right-8
+          sm:top-8
+          lg:left-10
+          lg:right-10
         "
       />
 
-      {/* Thin bottom line */}
       <motion.div
         initial={{
           scaleX: 0,
@@ -430,11 +384,11 @@ export default function BookJkayySection() {
         }}
         viewport={{
           once: true,
-          amount: 0.5,
+          amount: 0.4,
         }}
         transition={{
-          duration: 1.5,
-          delay: 0.15,
+          duration: 0.7,
+          delay: 0.08,
           ease: premiumEase,
         }}
         className="
@@ -447,33 +401,38 @@ export default function BookJkayySection() {
           origin-center
           bg-gradient-to-r
           from-transparent
-          via-white/20
+          via-white/18
           to-transparent
-          sm:bottom-9
-          sm:left-10
-          sm:right-10
+          sm:bottom-8
+          sm:left-8
+          sm:right-8
+          lg:left-10
+          lg:right-10
         "
       />
 
-      {/* Large background text */}
       <motion.div
         aria-hidden="true"
         animate={
-          shouldReduceMotion
-            ? undefined
+          animateDecor
+            ? {
+                x: ["1%", "-1%", "1%"],
+              }
             : {
-                x: [
-                  "2%",
-                  "-2%",
-                  "2%",
-                ],
+                x: "0%",
               }
         }
-        transition={{
-          duration: 20,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
+        transition={
+          animateDecor
+            ? {
+                duration: 22,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }
+            : {
+                duration: 0.3,
+              }
+        }
         className="
           pointer-events-none
           absolute
@@ -486,17 +445,16 @@ export default function BookJkayySection() {
           select-none
           whitespace-nowrap
           text-center
-          text-[20vw]
+          text-[19vw]
           font-medium
           uppercase
           leading-none
           tracking-[-0.09em]
-          text-white/[0.018]
-          lg:block
+          text-white/[0.014]
+          xl:block
         "
         style={{
-          fontFamily:
-            luxuryFont.style.fontFamily,
+          fontFamily: luxuryFont.style.fontFamily,
         }}
       >
         JKAYY JKAYY
@@ -515,93 +473,89 @@ export default function BookJkayySection() {
           text-center
         "
       >
-        {/* Section label */}
         <motion.div
           initial={{
             opacity: 0,
-            y: 20,
-            filter: "blur(8px)",
+            y: 16,
           }}
           whileInView={{
             opacity: 1,
             y: 0,
-            filter: "blur(0px)",
           }}
           viewport={{
             once: true,
-            amount: 0.5,
+            amount: 0.35,
           }}
           transition={{
-            duration: 0.85,
+            duration: 0.52,
             ease: premiumEase,
           }}
           className="
-            mb-9
+            mb-7
             flex
             items-center
-            gap-4
-            sm:mb-12
+            gap-3
+            sm:mb-9
+            sm:gap-4
           "
         >
-          <span className="h-px w-10 bg-white/25 sm:w-16" />
+          <span className="h-px w-8 bg-white/25 sm:w-14" />
 
           <span
             className="
-              text-[9px]
+              text-[8px]
               font-medium
               uppercase
-              tracking-[0.48em]
+              tracking-[0.40em]
               text-white/45
-              sm:text-[10px]
+              sm:text-[9px]
+              md:text-[10px]
             "
             style={{
-              fontFamily:
-                cleanFont.style.fontFamily,
+              fontFamily: cleanFont.style.fontFamily,
             }}
           >
             04 · Book JKAYY
           </span>
 
-          <span className="h-px w-10 bg-white/25 sm:w-16" />
+          <span className="h-px w-8 bg-white/25 sm:w-14" />
         </motion.div>
 
-        {/* Heading */}
         <motion.div
           initial={{
             opacity: 0,
-            y: 70,
-            scale: 0.92,
-            filter: "blur(16px)",
+            y: 30,
+            scale: 0.975,
           }}
           whileInView={{
             opacity: 1,
             y: 0,
             scale: 1,
-            filter: "blur(0px)",
           }}
           viewport={{
             once: true,
-            amount: 0.4,
+            amount: 0.3,
           }}
           transition={{
-            duration: 1.15,
-            delay: 0.1,
+            duration: 0.65,
+            delay: 0.05,
             ease: premiumEase,
           }}
           className="relative"
         >
           <p
             className="
-              mb-3
-              text-[clamp(1.4rem,3vw,2.8rem)]
+              mb-2
+              text-[clamp(1.15rem,5vw,2.4rem)]
               font-normal
               italic
               leading-none
-              text-white/45
+              text-white/42
+              sm:text-[clamp(1.3rem,3vw,2.6rem)]
+              lg:text-[clamp(1.5rem,2.4vw,2.8rem)]
             "
             style={{
-              fontFamily:
-                luxuryFont.style.fontFamily,
+              fontFamily: luxuryFont.style.fontFamily,
             }}
           >
             Ready to create
@@ -609,17 +563,20 @@ export default function BookJkayySection() {
 
           <h2
             className="
-              max-w-[1100px]
-              text-[clamp(3.6rem,9vw,9.5rem)]
+              max-w-[94vw]
+              text-[clamp(3rem,14vw,5.7rem)]
               font-medium
               uppercase
-              leading-[0.77]
-              tracking-[-0.07em]
+              leading-[0.78]
+              tracking-[-0.065em]
               text-white
+              sm:text-[clamp(4rem,10vw,7.4rem)]
+              md:text-[clamp(4.6rem,9vw,8.2rem)]
+              lg:max-w-[1100px]
+              lg:text-[clamp(5.4rem,7.3vw,9.2rem)]
             "
             style={{
-              fontFamily:
-                luxuryFont.style.fontFamily,
+              fontFamily: luxuryFont.style.fontFamily,
             }}
           >
             An Unforgettable
@@ -629,57 +586,34 @@ export default function BookJkayySection() {
                 block
                 font-normal
                 italic
-                text-white/65
+                text-white/62
               "
             >
               Night?
             </span>
           </h2>
 
-          <motion.span
+          <span
             aria-hidden="true"
-            animate={
-              shouldReduceMotion
-                ? undefined
-                : {
-                    scaleX: [
-                      0.65,
-                      1,
-                      0.65,
-                    ],
-                    opacity: [
-                      0.2,
-                      0.7,
-                      0.2,
-                    ],
-                  }
-            }
-            transition={{
-              duration: 3.5,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
             className="
               absolute
-              -bottom-7
+              -bottom-5
               left-1/2
               h-px
-              w-[42%]
+              w-[40%]
               -translate-x-1/2
               bg-gradient-to-r
               from-transparent
-              via-white/80
+              via-white/48
               to-transparent
-              shadow-[0_0_22px_rgba(255,255,255,0.55)]
             "
           />
         </motion.div>
 
-        {/* CTA */}
         <motion.div
           initial={{
             opacity: 0,
-            y: 30,
+            y: 18,
           }}
           whileInView={{
             opacity: 1,
@@ -687,83 +621,37 @@ export default function BookJkayySection() {
           }}
           viewport={{
             once: true,
-            amount: 0.4,
+            amount: 0.3,
           }}
           transition={{
-            duration: 0.85,
-            delay: 0.38,
+            duration: 0.52,
+            delay: 0.16,
             ease: premiumEase,
           }}
-          className="mt-16 sm:mt-20"
+          className="mt-12 sm:mt-14 md:mt-16"
         >
           <MagneticBookButton />
         </motion.div>
       </div>
 
-      {/* Corner details */}
-      <span
-        className="
-          pointer-events-none
-          absolute
-          left-5
-          top-6
-          h-6
-          w-6
-          border-l
-          border-t
-          border-white/20
-          sm:left-10
-          sm:top-9
-        "
-      />
-
-      <span
-        className="
-          pointer-events-none
-          absolute
-          right-5
-          top-6
-          h-6
-          w-6
-          border-r
-          border-t
-          border-white/20
-          sm:right-10
-          sm:top-9
-        "
-      />
-
-      <span
-        className="
-          pointer-events-none
-          absolute
-          bottom-6
-          left-5
-          h-6
-          w-6
-          border-b
-          border-l
-          border-white/20
-          sm:bottom-9
-          sm:left-10
-        "
-      />
-
-      <span
-        className="
-          pointer-events-none
-          absolute
-          bottom-6
-          right-5
-          h-6
-          w-6
-          border-b
-          border-r
-          border-white/20
-          sm:bottom-9
-          sm:right-10
-        "
-      />
+      {[
+        "left-5 top-6 border-l border-t sm:left-8 sm:top-8",
+        "right-5 top-6 border-r border-t sm:right-8 sm:top-8",
+        "bottom-6 left-5 border-b border-l sm:bottom-8 sm:left-8",
+        "bottom-6 right-5 border-b border-r sm:bottom-8 sm:right-8",
+      ].map((classes) => (
+        <span
+          key={classes}
+          className={`
+            pointer-events-none
+            absolute
+            h-5
+            w-5
+            border-white/20
+            ${classes}
+          `}
+        />
+      ))}
     </section>
   );
 }

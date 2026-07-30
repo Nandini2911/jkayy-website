@@ -3,6 +3,7 @@
 import {
   motion,
   type MotionValue,
+  useMotionValueEvent,
   useReducedMotion,
   useScroll,
   useSpring,
@@ -14,7 +15,9 @@ import {
 } from "next/font/google";
 import {
   type ComponentType,
+  useEffect,
   useRef,
+  useState,
 } from "react";
 
 const luxuryFont = Cormorant_Garamond({
@@ -32,6 +35,11 @@ const cleanFont = Manrope({
 
 const premiumEase = [0.16, 1, 0.3, 1] as const;
 
+type VisualProps = {
+  active: boolean;
+  compact?: boolean;
+};
+
 type ExperienceCard = {
   id: string;
   number: string;
@@ -40,72 +48,125 @@ type ExperienceCard = {
   description: string;
   items: string[];
   direction: "left" | "right";
-  position: string;
-  visual: ComponentType;
+  visual: ComponentType<VisualProps>;
   glow: string;
 };
 
-function SoundVisual() {
+function useDesktopLayout() {
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia("(min-width: 1024px)");
+
+    const update = () => {
+      setIsDesktop(media.matches);
+    };
+
+    update();
+
+    if (media.addEventListener) {
+      media.addEventListener("change", update);
+
+      return () => {
+        media.removeEventListener("change", update);
+      };
+    }
+
+    media.addListener(update);
+
+    return () => {
+      media.removeListener(update);
+    };
+  }, []);
+
+  return isDesktop;
+}
+
+function SoundVisual({
+  active,
+}: VisualProps) {
   const bars = [
-    22, 38, 62, 88, 52, 75,
-    98, 58, 84, 48, 68, 30,
+    30, 54, 82, 46, 92, 62, 76, 38,
   ];
 
   return (
-    <div className="relative flex h-full min-h-[145px] items-center justify-center overflow-hidden">
+    <div className="relative flex h-full min-h-[118px] items-center justify-center overflow-hidden sm:min-h-[135px]">
       <motion.div
-        animate={{
-          scale: [0.8, 1.35],
-          opacity: [0.5, 0],
-        }}
-        transition={{
-          duration: 2.4,
-          repeat: Infinity,
-          ease: "easeOut",
-        }}
-        className="absolute h-28 w-28 rounded-full border border-white/25"
+        animate={
+          active
+            ? {
+                scale: [0.82, 1.22],
+                opacity: [0.34, 0],
+              }
+            : {
+                scale: 1,
+                opacity: 0.14,
+              }
+        }
+        transition={
+          active
+            ? {
+                duration: 2.2,
+                repeat: Infinity,
+                ease: "easeOut",
+              }
+            : {
+                duration: 0.3,
+              }
+        }
+        className="absolute h-20 w-20 rounded-full border border-white/20 sm:h-24 sm:w-24"
       />
 
-      <motion.div
-        animate={{
-          scale: [0.75, 1.15, 0.75],
-          opacity: [0.25, 0.65, 0.25],
-        }}
-        transition={{
-          duration: 2,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        className="absolute h-20 w-20 rounded-full border border-white/20"
-      />
-
-      <div className="relative z-10 flex h-24 items-center gap-1.5">
+      <div className="relative z-10 flex h-20 items-center gap-1.5 sm:h-24">
         {bars.map((height, index) => (
           <motion.span
-            key={`sound-bar-${index}`}
-            animate={{
-              height: [
-                `${Math.max(14, height - 30)}%`,
-                `${height}%`,
-                `${Math.max(18, height - 18)}%`,
-              ],
-              opacity: [0.35, 1, 0.45],
-            }}
-            transition={{
-              duration: 0.9 + (index % 4) * 0.18,
-              delay: index * 0.05,
-              repeat: Infinity,
-              ease: "easeInOut",
+            key={`sound-${index}`}
+            animate={
+              active
+                ? {
+                    scaleY: [
+                      0.45,
+                      1,
+                      0.62,
+                    ],
+                    opacity: [
+                      0.42,
+                      0.95,
+                      0.55,
+                    ],
+                  }
+                : {
+                    scaleY: 0.62,
+                    opacity: 0.45,
+                  }
+            }
+            transition={
+              active
+                ? {
+                    duration:
+                      0.8 +
+                      (index % 4) * 0.12,
+                    delay:
+                      index * 0.035,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }
+                : {
+                    duration: 0.25,
+                  }
+            }
+            style={{
+              height: `${height}%`,
+              transformOrigin: "center",
             }}
             className="
               block
               w-[3px]
               rounded-full
               bg-gradient-to-t
-              from-white/80
+              from-white/75
               via-neutral-300
               to-neutral-500
-              shadow-[0_0_14px_rgba(255,255,255,0.55)]
             "
           />
         ))}
@@ -114,312 +175,303 @@ function SoundVisual() {
   );
 }
 
-function LightsVisual() {
+function LightsVisual({
+  active,
+}: VisualProps) {
   return (
-    <div className="relative h-full min-h-[145px] overflow-hidden">
+    <div className="relative h-full min-h-[118px] overflow-hidden sm:min-h-[135px]">
       <div
         className="
           absolute
           left-1/2
-          top-6
-          h-3
-          w-14
+          top-5
+          h-2
+          w-12
           -translate-x-1/2
           rounded-full
           bg-white
-          shadow-[0_0_25px_rgba(255,255,255,0.9)]
-        "
-      />
-
-      <motion.span
-        animate={{
-          rotate: [-28, 24, -28],
-        }}
-        transition={{
-          duration: 4.2,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        className="
-          absolute
-          left-1/2
-          top-8
-          h-[170px]
-          w-px
-          origin-top
-          bg-gradient-to-b
-          from-white
-          via-neutral-300/80
-          to-transparent
-          shadow-[0_0_16px_rgba(255,255,255,0.8)]
-        "
-      />
-
-      <motion.span
-        animate={{
-          rotate: [28, -20, 28],
-        }}
-        transition={{
-          duration: 5,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        className="
-          absolute
-          left-1/2
-          top-8
-          h-[170px]
-          w-px
-          origin-top
-          bg-gradient-to-b
-          from-neutral-100
-          via-neutral-400/80
-          to-transparent
           shadow-[0_0_16px_rgba(255,255,255,0.65)]
         "
       />
 
       <motion.span
-        animate={{
-          rotate: [-42, 38, -42],
-        }}
-        transition={{
-          duration: 6,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
+        animate={
+          active
+            ? {
+                rotate: [-24, 20, -24],
+              }
+            : {
+                rotate: -12,
+              }
+        }
+        transition={
+          active
+            ? {
+                duration: 4.2,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }
+            : {
+                duration: 0.3,
+              }
+        }
         className="
           absolute
           left-1/2
-          top-8
-          h-[150px]
+          top-7
+          h-[145px]
           w-px
           origin-top
           bg-gradient-to-b
-          from-neutral-200
-          via-neutral-500/60
+          from-white
+          via-neutral-300/70
           to-transparent
         "
       />
 
-      <motion.div
-        animate={{
-          scaleX: [0.75, 1.15, 0.75],
-          opacity: [0.15, 0.5, 0.15],
-        }}
-        transition={{
-          duration: 2.8,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
+      <motion.span
+        animate={
+          active
+            ? {
+                rotate: [26, -18, 26],
+              }
+            : {
+                rotate: 14,
+              }
+        }
+        transition={
+          active
+            ? {
+                duration: 4.8,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }
+            : {
+                duration: 0.3,
+              }
+        }
+        className="
+          absolute
+          left-1/2
+          top-7
+          h-[145px]
+          w-px
+          origin-top
+          bg-gradient-to-b
+          from-neutral-100
+          via-neutral-400/65
+          to-transparent
+        "
+      />
+
+      <div
         className="
           absolute
           bottom-4
           left-1/2
-          h-14
-          w-32
+          h-10
+          w-24
           -translate-x-1/2
           rounded-[50%]
           border
-          border-white/20
-          bg-white/[0.04]
+          border-white/15
+          bg-white/[0.025]
         "
       />
     </div>
   );
 }
 
-function EnergyVisual() {
+function EnergyVisual({
+  active,
+}: VisualProps) {
   return (
-    <div className="relative flex h-full min-h-[145px] items-center justify-center overflow-hidden">
-      {[112, 82, 54].map((size, index) => (
-        <motion.div
-          key={size}
-          animate={{
-            rotate: index % 2 === 0 ? 360 : -360,
-            scale: [1, 1.04, 1],
-          }}
-          transition={{
-            rotate: {
-              duration: 10 + index * 4,
-              repeat: Infinity,
-              ease: "linear",
-            },
-            scale: {
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut",
-            },
-          }}
-          style={{
-            height: size,
-            width: size,
-          }}
-          className={`
-            absolute
-            rounded-full
-            border
-            ${
-              index === 0
-                ? "border-white/30"
-                : index === 1
-                  ? "border-white/20"
-                  : "border-white/25"
+    <div className="relative flex h-full min-h-[118px] items-center justify-center overflow-hidden sm:min-h-[135px]">
+      {[96, 66].map(
+        (size, index) => (
+          <motion.div
+            key={size}
+            animate={
+              active
+                ? {
+                    rotate:
+                      index === 0
+                        ? 360
+                        : -360,
+                  }
+                : {
+                    rotate: 0,
+                  }
             }
-          `}
-        >
-          <span
+            transition={
+              active
+                ? {
+                    duration:
+                      index === 0
+                        ? 12
+                        : 16,
+                    repeat: Infinity,
+                    ease: "linear",
+                  }
+                : {
+                    duration: 0.3,
+                  }
+            }
+            style={{
+              height: size,
+              width: size,
+            }}
             className="
               absolute
-              left-1/2
-              top-[-3px]
-              h-1.5
-              w-1.5
-              -translate-x-1/2
               rounded-full
-              bg-white
-              shadow-[0_0_12px_white]
+              border
+              border-white/20
             "
-          />
-        </motion.div>
-      ))}
+          >
+            <span
+              className="
+                absolute
+                left-1/2
+                top-[-3px]
+                h-1.5
+                w-1.5
+                -translate-x-1/2
+                rounded-full
+                bg-white
+              "
+            />
+          </motion.div>
+        ),
+      )}
 
       <motion.div
-        animate={{
-          scale: [0.8, 1.2, 0.8],
-          boxShadow: [
-            "0 0 15px rgba(255,255,255,0.18)",
-            "0 0 40px rgba(255,255,255,0.6)",
-            "0 0 15px rgba(255,255,255,0.18)",
-          ],
-        }}
-        transition={{
-          duration: 1.4,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
+        animate={
+          active
+            ? {
+                scale: [
+                  0.88,
+                  1.08,
+                  0.88,
+                ],
+                opacity: [
+                  0.6,
+                  1,
+                  0.6,
+                ],
+              }
+            : {
+                scale: 1,
+                opacity: 0.7,
+              }
+        }
+        transition={
+          active
+            ? {
+                duration: 1.7,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }
+            : {
+                duration: 0.3,
+              }
+        }
         className="
           relative
           z-10
-          h-9
-          w-9
+          h-8
+          w-8
           rounded-full
           border
-          border-white/50
-          bg-white/10
-          backdrop-blur-xl
+          border-white/45
+          bg-white/[0.08]
         "
       />
-
-      <div className="absolute inset-x-8 bottom-1 flex items-end justify-center gap-2">
-        {[13, 25, 17, 34, 21, 29, 15].map(
-          (height, index) => (
-            <motion.span
-              key={`energy-bar-${index}`}
-              animate={{
-                height: [height, height + 12, height],
-              }}
-              transition={{
-                duration: 1,
-                delay: index * 0.08,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-              style={{ height }}
-              className="w-1 rounded-full bg-white/30"
-            />
-          ),
-        )}
-      </div>
     </div>
   );
 }
 
-function AtmosphereVisual() {
+function AtmosphereVisual({
+  active,
+}: VisualProps) {
   return (
-    <div className="relative flex h-full min-h-[145px] items-center justify-center overflow-hidden">
+    <div className="relative flex h-full min-h-[118px] items-center justify-center overflow-hidden sm:min-h-[135px]">
       <motion.div
-        animate={{
-          rotate: 360,
-        }}
-        transition={{
-          duration: 16,
-          repeat: Infinity,
-          ease: "linear",
-        }}
+        animate={
+          active
+            ? {
+                rotate: 360,
+              }
+            : {
+                rotate: 0,
+              }
+        }
+        transition={
+          active
+            ? {
+                duration: 18,
+                repeat: Infinity,
+                ease: "linear",
+              }
+            : {
+                duration: 0.3,
+              }
+        }
         className="
           relative
-          h-28
-          w-28
+          h-24
+          w-24
           rounded-full
           border
           border-white/15
-          bg-[radial-gradient(circle_at_35%_30%,rgba(255,255,255,0.18),rgba(255,255,255,0.045)_38%,transparent_72%)]
-          shadow-[0_0_55px_rgba(255,255,255,0.12)]
+          bg-[radial-gradient(circle_at_35%_30%,rgba(255,255,255,0.14),rgba(255,255,255,0.03)_38%,transparent_72%)]
         "
       >
-        <div className="absolute inset-3 rounded-full border border-white/20" />
-        <div className="absolute inset-7 rounded-full border border-white/10" />
+        <div className="absolute inset-3 rounded-full border border-white/15" />
 
         <span
           className="
             absolute
             left-1/2
-            top-[-4px]
-            h-2
-            w-2
+            top-[-3px]
+            h-1.5
+            w-1.5
             -translate-x-1/2
             rounded-full
             bg-white
-            shadow-[0_0_14px_rgba(255,255,255,0.8)]
-          "
-        />
-
-        <span
-          className="
-            absolute
-            bottom-3
-            right-1
-            h-2
-            w-2
-            rounded-full
-            bg-white
-            shadow-[0_0_14px_rgba(255,255,255,0.65)]
           "
         />
       </motion.div>
 
       <motion.span
-        animate={{
-          scale: [0.75, 1.45],
-          opacity: [0.4, 0],
-        }}
-        transition={{
-          duration: 2.8,
-          repeat: Infinity,
-          ease: "easeOut",
-        }}
-        className="absolute h-28 w-28 rounded-full border border-white/25"
-      />
-
-      <motion.span
-        animate={{
-          scale: [0.8, 1.15, 0.8],
-          opacity: [0.45, 1, 0.45],
-        }}
-        transition={{
-          duration: 1.8,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        className="
-          absolute
-          h-3
-          w-3
-          rounded-full
-          bg-white
-          shadow-[0_0_22px_white]
-        "
+        animate={
+          active
+            ? {
+                scale: [
+                  0.82,
+                  1.28,
+                ],
+                opacity: [
+                  0.28,
+                  0,
+                ],
+              }
+            : {
+                scale: 1,
+                opacity: 0.12,
+              }
+        }
+        transition={
+          active
+            ? {
+                duration: 2.6,
+                repeat: Infinity,
+                ease: "easeOut",
+              }
+            : {
+                duration: 0.3,
+              }
+        }
+        className="absolute h-24 w-24 rounded-full border border-white/18"
       />
     </div>
   );
@@ -433,13 +485,15 @@ const experienceCards: ExperienceCard[] = [
     subtitle: "Feel every frequency",
     description:
       "A sonic journey built through rhythm, tension and release.",
-    items: ["Deep Techno", "Trance", "Live Mixing"],
+    items: [
+      "Deep Techno",
+      "Trance",
+      "Live Mixing",
+    ],
     direction: "left",
-    position:
-      "",
     visual: SoundVisual,
     glow:
-      "radial-gradient(circle at 75% 20%, rgba(255,255,255,0.12), transparent 48%)",
+      "radial-gradient(circle at 75% 20%, rgba(255,255,255,0.10), transparent 50%)",
   },
   {
     id: "lights",
@@ -448,13 +502,15 @@ const experienceCards: ExperienceCard[] = [
     subtitle: "See the sound",
     description:
       "Lasers and visuals transform every drop into a spectacle.",
-    items: ["Lasers", "Visuals", "Smoke"],
+    items: [
+      "Lasers",
+      "Visuals",
+      "Smoke",
+    ],
     direction: "right",
-    position:
-      "",
     visual: LightsVisual,
     glow:
-      "radial-gradient(circle at 65% 20%, rgba(255,255,255,0.09), transparent 48%)",
+      "radial-gradient(circle at 65% 20%, rgba(255,255,255,0.08), transparent 50%)",
   },
   {
     id: "energy",
@@ -463,13 +519,15 @@ const experienceCards: ExperienceCard[] = [
     subtitle: "Move as one",
     description:
       "Artist and audience become part of the same shared pulse.",
-    items: ["Crowd", "Dance", "Connection"],
+    items: [
+      "Crowd",
+      "Dance",
+      "Connection",
+    ],
     direction: "left",
-    position:
-      "",
     visual: EnergyVisual,
     glow:
-      "radial-gradient(circle at 30% 20%, rgba(255,255,255,0.11), transparent 48%)",
+      "radial-gradient(circle at 30% 20%, rgba(255,255,255,0.09), transparent 50%)",
   },
   {
     id: "atmosphere",
@@ -478,22 +536,26 @@ const experienceCards: ExperienceCard[] = [
     subtitle: "Remember the feeling",
     description:
       "An immersive moment that remains after the music ends.",
-    items: ["Immersive", "Emotional", "Unforgettable"],
+    items: [
+      "Immersive",
+      "Emotional",
+      "Unforgettable",
+    ],
     direction: "right",
-    position:
-      "",
     visual: AtmosphereVisual,
     glow:
-      "radial-gradient(circle at 70% 25%, rgba(255,255,255,0.08), transparent 48%)",
+      "radial-gradient(circle at 70% 25%, rgba(255,255,255,0.07), transparent 50%)",
   },
 ];
 
 function CardContent({
   card,
   compact = false,
+  active = false,
 }: {
   card: ExperienceCard;
   compact?: boolean;
+  active?: boolean;
 }) {
   const Visual = card.visual;
 
@@ -503,16 +565,12 @@ function CardContent({
         compact
           ? undefined
           : {
-              y: -10,
-              scale: 1.012,
-              rotateZ:
-                card.direction === "left"
-                  ? -0.25
-                  : 0.25,
+              y: -5,
+              scale: 1.006,
             }
       }
       transition={{
-        duration: 0.45,
+        duration: 0.32,
         ease: premiumEase,
       }}
       className={`
@@ -521,29 +579,33 @@ function CardContent({
         h-full
         w-full
         overflow-hidden
-        rounded-[28px]
+        rounded-[24px]
         border
         border-white/10
-        bg-[#090909]/95
-        shadow-[0_35px_120px_rgba(0,0,0,0.7)]
-        backdrop-blur-2xl
-        sm:rounded-[34px]
+        bg-[#090909]
+        shadow-[0_22px_70px_rgba(0,0,0,0.46)]
+        sm:rounded-[28px]
+        lg:rounded-[30px]
 
         ${
           compact
-            ? "p-5 sm:p-6"
-            : "p-6 xl:p-8"
+            ? "p-4 sm:p-5 md:p-6"
+            : "p-5 xl:p-7"
         }
       `}
+      style={{
+        contain:
+          "layout paint style",
+      }}
     >
       <div
         className="
           pointer-events-none
           absolute
           inset-0
-          opacity-75
+          opacity-80
           transition-opacity
-          duration-700
+          duration-500
           group-hover:opacity-100
         "
         style={{
@@ -562,32 +624,19 @@ function CardContent({
         "
       />
 
-      <motion.div
-        aria-hidden="true"
-        animate={{
-          x: ["-180%", "240%"],
-          opacity: [0, 0.16, 0],
-        }}
-        transition={{
-          duration: 7,
-          repeat: Infinity,
-          repeatDelay: 2.5,
-          ease: "linear",
-        }}
+      <div
         className="
           pointer-events-none
           absolute
-          inset-y-0
-          left-0
-          hidden
-          w-[16%]
-          -skew-x-12
-          bg-gradient-to-r
-          from-transparent
-          via-white/25
+          -right-[20%]
+          -top-[35%]
+          h-[70%]
+          w-[55%]
+          rotate-12
+          bg-gradient-to-br
+          from-white/[0.05]
           to-transparent
-          blur-2xl
-          sm:block
+          opacity-70
         "
       />
 
@@ -597,12 +646,12 @@ function CardContent({
           z-10
           grid
           h-full
-          grid-rows-[minmax(0,0.42fr)_minmax(0,0.58fr)]
-          gap-4
-          sm:gap-5
-          md:grid-cols-[minmax(0,1fr)_42%]
+          grid-rows-[minmax(0,0.40fr)_minmax(0,0.60fr)]
+          gap-3
+          sm:gap-4
+          md:grid-cols-[minmax(0,1fr)_40%]
           md:grid-rows-1
-          md:gap-6
+          md:gap-5
         "
       >
         <div
@@ -615,37 +664,37 @@ function CardContent({
             md:order-1
           "
         >
-          <div className="flex items-center gap-3">
-            <motion.span
-              animate={{
-                scale: [0.75, 1.25, 0.75],
-                opacity: [0.35, 1, 0.35],
-              }}
-              transition={{
-                duration: 1.6,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-              className="
+          <div className="flex items-center gap-2.5">
+            <span
+              className={`
                 h-1.5
                 w-1.5
                 rounded-full
                 bg-white
-                shadow-[0_0_14px_white]
-              "
+                transition-opacity
+                duration-300
+
+                ${
+                  active
+                    ? "opacity-100"
+                    : "opacity-40"
+                }
+              `}
             />
 
             <span
               className="
-                text-[8px]
+                text-[7px]
                 font-medium
                 uppercase
-                tracking-[0.34em]
+                tracking-[0.30em]
                 text-white/40
-                sm:text-[9px]
+                sm:text-[8px]
+                lg:text-[9px]
               "
               style={{
-                fontFamily: cleanFont.style.fontFamily,
+                fontFamily:
+                  cleanFont.style.fontFamily,
               }}
             >
               Experience {card.number}
@@ -655,16 +704,18 @@ function CardContent({
           <div className="mt-auto">
             <p
               className="
-                mb-2
-                text-[8px]
+                mb-1.5
+                text-[7px]
                 font-medium
                 uppercase
-                tracking-[0.28em]
-                text-white/35
-                sm:text-[9px]
+                tracking-[0.24em]
+                text-white/34
+                sm:text-[8px]
+                lg:text-[9px]
               "
               style={{
-                fontFamily: cleanFont.style.fontFamily,
+                fontFamily:
+                  cleanFont.style.fontFamily,
               }}
             >
               {card.subtitle}
@@ -673,21 +724,19 @@ function CardContent({
             <h3
               className={`
                 font-medium
-                leading-[0.78]
-                tracking-[-0.065em]
+                leading-[0.80]
+                tracking-[-0.06em]
                 text-white
-                transition-transform
-                duration-700
-                group-hover:translate-x-1.5
 
                 ${
                   compact
-                    ? "text-[clamp(2.9rem,13vw,4.9rem)]"
-                    : "text-[clamp(4rem,6vw,6.8rem)]"
+                    ? "text-[clamp(2.45rem,11vw,4.4rem)] sm:text-[clamp(3rem,7vw,4.8rem)]"
+                    : "text-[clamp(3.6rem,5vw,6rem)]"
                 }
               `}
               style={{
-                fontFamily: luxuryFont.style.fontFamily,
+                fontFamily:
+                  luxuryFont.style.fontFamily,
               }}
             >
               {card.title}
@@ -695,53 +744,53 @@ function CardContent({
 
             <p
               className="
-                mt-4
-                max-w-[330px]
-                text-[10px]
-                leading-5
+                mt-3
+                max-w-[320px]
+                text-[9px]
+                leading-[1.7]
                 text-white/38
-                transition-colors
-                duration-500
-                group-hover:text-white/60
-                sm:text-[11px]
-                sm:leading-6
+                sm:text-[10px]
+                lg:text-[11px]
               "
               style={{
-                fontFamily: cleanFont.style.fontFamily,
+                fontFamily:
+                  cleanFont.style.fontFamily,
               }}
             >
               {card.description}
             </p>
 
-            <div className="mt-4 flex flex-wrap gap-1.5 sm:mt-5">
-              {card.items.map((item) => (
-                <span
-                  key={`${card.id}-${item}`}
-                  className="
-                    rounded-full
-                    border
-                    border-white/10
-                    bg-white/[0.025]
-                    px-3
-                    py-2
-                    text-[7px]
-                    font-medium
-                    uppercase
-                    tracking-[0.18em]
-                    text-white/45
-                    transition-all
-                    duration-500
-                    group-hover:border-white/25
-                    group-hover:text-white/80
-                    sm:text-[8px]
-                  "
-                  style={{
-                    fontFamily: cleanFont.style.fontFamily,
-                  }}
-                >
-                  {item}
-                </span>
-              ))}
+            <div className="mt-3 flex flex-wrap gap-1.5 sm:mt-4">
+              {card.items.map(
+                (item) => (
+                  <span
+                    key={`${card.id}-${item}`}
+                    className="
+                      rounded-full
+                      border
+                      border-white/10
+                      bg-white/[0.02]
+                      px-2.5
+                      py-1.5
+                      text-[6px]
+                      font-medium
+                      uppercase
+                      tracking-[0.15em]
+                      text-white/42
+                      sm:px-3
+                      sm:py-2
+                      sm:text-[7px]
+                    "
+                    style={{
+                      fontFamily:
+                        cleanFont.style
+                          .fontFamily,
+                    }}
+                  >
+                    {item}
+                  </span>
+                ),
+              )}
             </div>
           </div>
         </div>
@@ -752,16 +801,12 @@ function CardContent({
             relative
             min-h-0
             overflow-hidden
-            rounded-[22px]
+            rounded-[18px]
             border
-            border-white/[0.07]
+            border-white/[0.06]
             bg-black/35
-            transition-colors
-            duration-700
-            group-hover:border-white/18
-            group-hover:bg-black/50
             md:order-2
-            md:rounded-[24px]
+            md:rounded-[22px]
           "
         >
           <div
@@ -769,36 +814,20 @@ function CardContent({
               pointer-events-none
               absolute
               inset-0
-              bg-[linear-gradient(rgba(255,255,255,0.028)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.028)_1px,transparent_1px)]
-              bg-[size:22px_22px]
+              opacity-[0.028]
+              [background-image:linear-gradient(rgba(255,255,255,0.8)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.8)_1px,transparent_1px)]
+              [background-size:24px_24px]
             "
           />
 
           <div className="relative z-10 h-full">
-            <Visual />
+            <Visual
+              active={active}
+              compact={compact}
+            />
           </div>
         </div>
       </div>
-
-      <div
-        className="
-          pointer-events-none
-          absolute
-          bottom-0
-          left-1/2
-          h-px
-          w-0
-          -translate-x-1/2
-          bg-gradient-to-r
-          from-transparent
-          via-white
-          to-transparent
-          shadow-[0_0_18px_rgba(255,255,255,0.9)]
-          transition-all
-          duration-1000
-          group-hover:w-[88%]
-        "
-      />
     </motion.div>
   );
 }
@@ -809,52 +838,68 @@ function DesktopScrollCard({
   progress,
   start,
   end,
+  active,
 }: {
   card: ExperienceCard;
   index: number;
   progress: MotionValue<number>;
   start: number;
   end: number;
+  active: boolean;
 }) {
   const isLast =
     index === experienceCards.length - 1;
 
-  const rawX = useTransform(
+  const x = useTransform(
     progress,
     [
       start,
       start + 0.055,
-      end - 0.045,
+      end - 0.04,
       end,
     ],
     [
-      card.direction === "left" ? -260 : 260,
+      card.direction === "left"
+        ? -180
+        : 180,
       0,
       0,
-      card.direction === "left" ? 120 : -120,
+      card.direction === "left"
+        ? 72
+        : -72,
     ],
   );
 
-  const rawY = useTransform(
+  const y = useTransform(
     progress,
     [
       start,
       start + 0.055,
-      end - 0.045,
+      end - 0.04,
       end,
     ],
-    [80, 0, 0, -55],
+    [
+      52,
+      0,
+      0,
+      -34,
+    ],
   );
 
-  const rawScale = useTransform(
+  const scale = useTransform(
     progress,
     [
       start,
       start + 0.055,
-      end - 0.045,
+      end - 0.04,
       end,
     ],
-    [0.88, 1, 1, 0.95],
+    [
+      0.94,
+      1,
+      1,
+      0.975,
+    ],
   );
 
   const opacity = useTransform(
@@ -865,26 +910,13 @@ function DesktopScrollCard({
       end - 0.035,
       end,
     ],
-    [0, 1, 1, isLast ? 1 : 0],
+    [
+      0,
+      1,
+      1,
+      isLast ? 1 : 0,
+    ],
   );
-
-  const x = useSpring(rawX, {
-    stiffness: 105,
-    damping: 24,
-    mass: 0.55,
-  });
-
-  const y = useSpring(rawY, {
-    stiffness: 105,
-    damping: 24,
-    mass: 0.55,
-  });
-
-  const scale = useSpring(rawScale, {
-    stiffness: 105,
-    damping: 24,
-    mass: 0.55,
-  });
 
   return (
     <div
@@ -892,9 +924,10 @@ function DesktopScrollCard({
         pointer-events-none
         absolute
         inset-x-0
-        top-[29%]
+        top-[27%]
         flex
         justify-center
+        xl:top-[26%]
       "
       style={{
         zIndex: 20 + index,
@@ -910,14 +943,15 @@ function DesktopScrollCard({
         className="
           pointer-events-auto
           aspect-square
-          h-[64vh]
-          max-h-[610px]
-          min-h-[470px]
+          h-[clamp(410px,57vh,560px)]
+          max-w-[min(72vw,560px)]
           transform-gpu
-          will-change-transform
         "
       >
-        <CardContent card={card} />
+        <CardContent
+          card={card}
+          active={active}
+        />
       </motion.div>
     </div>
   );
@@ -929,82 +963,85 @@ function MobileScrollCard({
   progress,
   start,
   end,
+  active,
 }: {
   card: ExperienceCard;
   index: number;
   progress: MotionValue<number>;
   start: number;
   end: number;
+  active: boolean;
 }) {
   const isLast =
     index === experienceCards.length - 1;
 
-  const rawX = useTransform(
+  const x = useTransform(
     progress,
     [
       start,
-      start + 0.055,
+      start + 0.05,
       end - 0.04,
       end,
     ],
     [
-      card.direction === "left" ? -130 : 130,
+      card.direction === "left"
+        ? -58
+        : 58,
       0,
       0,
-      card.direction === "left" ? 48 : -48,
+      card.direction === "left"
+        ? 24
+        : -24,
     ],
   );
 
-  const rawY = useTransform(
+  const y = useTransform(
     progress,
     [
       start,
-      start + 0.055,
+      start + 0.05,
       end - 0.04,
       end,
     ],
-    [70, 0, 0, -42],
+    [
+      38,
+      0,
+      0,
+      -24,
+    ],
   );
 
-  const rawScale = useTransform(
+  const scale = useTransform(
     progress,
     [
       start,
-      start + 0.055,
+      start + 0.05,
       end - 0.04,
       end,
     ],
-    [0.9, 1, 1, 0.95],
+    [
+      0.96,
+      1,
+      1,
+      0.985,
+    ],
   );
 
   const opacity = useTransform(
     progress,
     [
       start,
-      start + 0.035,
-      end - 0.035,
+      start + 0.03,
+      end - 0.03,
       end,
     ],
-    [0, 1, 1, isLast ? 1 : 0],
+    [
+      0,
+      1,
+      1,
+      isLast ? 1 : 0,
+    ],
   );
-
-  const x = useSpring(rawX, {
-    stiffness: 115,
-    damping: 25,
-    mass: 0.5,
-  });
-
-  const y = useSpring(rawY, {
-    stiffness: 115,
-    damping: 25,
-    mass: 0.5,
-  });
-
-  const scale = useSpring(rawScale, {
-    stiffness: 115,
-    damping: 25,
-    mass: 0.5,
-  });
 
   return (
     <div
@@ -1012,12 +1049,14 @@ function MobileScrollCard({
         pointer-events-none
         absolute
         inset-x-0
-        top-[29%]
+        top-[31%]
         flex
         justify-center
         px-4
-        sm:top-[30%]
-        sm:px-7
+        min-[390px]:top-[30%]
+        sm:top-[29%]
+        sm:px-6
+        md:top-[28%]
       "
       style={{
         zIndex: 20 + index,
@@ -1033,15 +1072,16 @@ function MobileScrollCard({
         className="
           pointer-events-auto
           aspect-square
-          w-full
-          max-w-[440px]
+          w-[min(88vw,420px)]
           transform-gpu
-          will-change-transform
+          sm:w-[min(78vw,460px)]
+          md:w-[min(68vw,500px)]
         "
       >
         <CardContent
           card={card}
           compact
+          active={active}
         />
       </motion.div>
     </div>
@@ -1054,61 +1094,79 @@ function BackgroundWaveform({
   progress: MotionValue<number>;
 }) {
   const bars = [
-    16, 28, 42, 23, 56, 35,
-    70, 48, 84, 62, 96, 70,
-    100, 78, 92, 66, 82, 54,
-    72, 45, 58, 34, 42, 22,
+    18, 36, 54, 32,
+    70, 45, 82, 58,
+    92, 66, 78, 48,
+    64, 40, 52, 28,
   ];
 
   const opacity = useTransform(
     progress,
-    [0.06, 0.2, 0.9, 1],
-    [0, 0.22, 0.22, 0],
+    [
+      0.08,
+      0.2,
+      0.88,
+      1,
+    ],
+    [
+      0,
+      0.13,
+      0.13,
+      0,
+    ],
+  );
+
+  const y = useTransform(
+    progress,
+    [
+      0.1,
+      1,
+    ],
+    [
+      18,
+      -10,
+    ],
   );
 
   return (
     <motion.div
-      style={{ opacity }}
+      style={{
+        opacity,
+        y,
+      }}
       className="
         pointer-events-none
         absolute
         inset-x-0
         bottom-0
         flex
-        h-[28vh]
+        h-[22vh]
         items-end
         justify-center
         gap-1
         overflow-hidden
       "
     >
-      {bars.map((height, index) => (
-        <motion.span
-          key={`waveform-bar-${index}`}
-          animate={{
-            height: [
-              `${height * 0.28}%`,
-              `${height}%`,
-              `${height * 0.45}%`,
-            ],
-          }}
-          transition={{
-            duration:
-              1.2 + (index % 5) * 0.17,
-            delay: index * 0.035,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="
-            w-[3px]
-            rounded-t-full
-            bg-gradient-to-t
-            from-white/80
-            via-neutral-300
-            to-neutral-500
-          "
-        />
-      ))}
+      {bars.map(
+        (height, index) => (
+          <span
+            key={`wave-${index}`}
+            style={{
+              height: `${height}%`,
+            }}
+            className="
+              block
+              w-[2px]
+              rounded-t-full
+              bg-gradient-to-t
+              from-white/60
+              via-neutral-400
+              to-neutral-600
+              sm:w-[3px]
+            "
+          />
+        ),
+      )}
     </motion.div>
   );
 }
@@ -1120,146 +1178,241 @@ export default function TheExperience() {
   const shouldReduceMotion =
     useReducedMotion();
 
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end end"],
-  });
+  const isDesktop =
+    useDesktopLayout();
 
+  const [activeIndex, setActiveIndex] =
+    useState(0);
+
+  const { scrollYProgress } =
+    useScroll({
+      target: sectionRef,
+      offset: [
+        "start start",
+        "end end",
+      ],
+    });
+
+  /*
+   * One global spring only.
+   * All child motion values derive directly from this,
+   * avoiding stacked springs and delayed/jittery scroll.
+   */
   const progress = useSpring(
     scrollYProgress,
     {
-      stiffness: 75,
-      damping: 24,
-      mass: 0.65,
-      restDelta: 0.0005,
+      stiffness: 165,
+      damping: 32,
+      mass: 0.24,
+      restDelta: 0.001,
+      restSpeed: 0.001,
     },
   );
 
-  const panelY = useTransform(
+  useMotionValueEvent(
     progress,
-    [0, 0.07],
-    [0, 0],
+    "change",
+    (latest) => {
+      let next = 0;
+
+      if (latest >= 0.78) {
+        next = 3;
+      } else if (
+        latest >= 0.60
+      ) {
+        next = 2;
+      } else if (
+        latest >= 0.42
+      ) {
+        next = 1;
+      }
+
+      setActiveIndex(
+        (current) =>
+          current === next
+            ? current
+            : next,
+      );
+    },
   );
 
   const panelScale = useTransform(
     progress,
-    [0, 0.07],
-    [0.965, 1],
+    [
+      0,
+      0.08,
+    ],
+    [
+      0.988,
+      1,
+    ],
   );
 
-  const panelRadius = useTransform(
-    progress,
-    [0, 0.12],
-    [56, 0],
-  );
+  const panelRadius =
+    useTransform(
+      progress,
+      [
+        0,
+        0.1,
+      ],
+      [
+        38,
+        0,
+      ],
+    );
 
-  const eyebrowOpacity = useTransform(
-    progress,
-    [0.03, 0.09],
-    [0, 1],
-  );
+  const eyebrowOpacity =
+    useTransform(
+      progress,
+      [
+        0.02,
+        0.08,
+      ],
+      [
+        0,
+        1,
+      ],
+    );
 
-  const eyebrowY = useTransform(
-    progress,
-    [0.03, 0.1],
-    [24, 0],
-  );
+  const eyebrowY =
+    useTransform(
+      progress,
+      [
+        0.02,
+        0.09,
+      ],
+      [
+        14,
+        0,
+      ],
+    );
 
-  const headingOpacity = useTransform(
-    progress,
-    [0.06, 0.15],
-    [0, 1],
-  );
+  const headingOpacity =
+    useTransform(
+      progress,
+      [
+        0.045,
+        0.12,
+      ],
+      [
+        0,
+        1,
+      ],
+    );
 
-  const headingY = useTransform(
-    progress,
-    [0.06, 0.16],
-    [80, 0],
-  );
+  const headingY =
+    useTransform(
+      progress,
+      [
+        0.045,
+        0.13,
+      ],
+      [
+        42,
+        0,
+      ],
+    );
 
-  const headingScale = useTransform(
-    progress,
-    [0.06, 0.16],
-    [0.88, 1],
-  );
+  const descriptionOpacity =
+    useTransform(
+      progress,
+      [
+        0.09,
+        0.16,
+      ],
+      [
+        0,
+        1,
+      ],
+    );
 
-  const descriptionOpacity = useTransform(
-    progress,
-    [0.12, 0.2],
-    [0, 1],
-  );
+  const headerScale =
+    useTransform(
+      progress,
+      [
+        0.18,
+        0.3,
+      ],
+      [
+        1,
+        0.88,
+      ],
+    );
 
-  const descriptionY = useTransform(
-    progress,
-    [0.12, 0.2],
-    [30, 0],
-  );
+  const headerY =
+    useTransform(
+      progress,
+      [
+        0.18,
+        0.3,
+      ],
+      [
+        0,
+        -20,
+      ],
+    );
 
-  const headerScale = useTransform(
-    progress,
-    [0.2, 0.32],
-    [1, 0.83],
-  );
+  const giantTextX =
+    useTransform(
+      progress,
+      [
+        0,
+        1,
+      ],
+      [
+        "5%",
+        "-10%",
+      ],
+    );
 
-  const headerY = useTransform(
-    progress,
-    [0.2, 0.32],
-    [0, -28],
-  );
-
-  const giantTextX = useTransform(
-    progress,
-    [0, 1],
-    ["8%", "-18%"],
-  );
-
-  const glowRotate = useTransform(
-    progress,
-    [0, 1],
-    [0, 50],
-  );
-
-  const progressHeight = useTransform(
-    progress,
-    [0.18, 0.92],
-    ["0%", "100%"],
-  );
+  const progressHeight =
+    useTransform(
+      progress,
+      [
+        0.18,
+        0.92,
+      ],
+      [
+        "0%",
+        "100%",
+      ],
+    );
 
   const desktopRanges = [
     {
-      start: 0.24,
+      start: 0.22,
       end: 0.43,
     },
     {
-      start: 0.42,
-      end: 0.61,
+      start: 0.41,
+      end: 0.62,
     },
     {
-      start: 0.6,
-      end: 0.79,
+      start: 0.60,
+      end: 0.81,
     },
     {
-      start: 0.78,
-      end: 0.97,
+      start: 0.79,
+      end: 0.98,
     },
   ];
 
   const mobileRanges = [
     {
-      start: 0.24,
+      start: 0.21,
       end: 0.43,
     },
     {
-      start: 0.42,
-      end: 0.61,
+      start: 0.41,
+      end: 0.63,
     },
     {
-      start: 0.6,
-      end: 0.79,
+      start: 0.61,
+      end: 0.83,
     },
     {
-      start: 0.78,
-      end: 0.97,
+      start: 0.81,
+      end: 0.985,
     },
   ];
 
@@ -1270,12 +1423,16 @@ export default function TheExperience() {
       className="
         relative
         z-30
-        -mt-[100svh]
-        h-[600svh]
+        isolate
+        mt-0
+        h-[440svh]
         touch-pan-y
         bg-transparent
         text-white
-        lg:h-[620vh]
+        sm:h-[470svh]
+        md:h-[490svh]
+        lg:h-[480vh]
+        xl:h-[500vh]
       "
     >
       <motion.div
@@ -1283,22 +1440,24 @@ export default function TheExperience() {
           shouldReduceMotion
             ? undefined
             : {
-                y: panelY,
-                scale: panelScale,
-                borderTopLeftRadius: panelRadius,
-                borderTopRightRadius: panelRadius,
+                scale:
+                  panelScale,
+                borderTopLeftRadius:
+                  panelRadius,
+                borderTopRightRadius:
+                  panelRadius,
               }
         }
         className="
           sticky
           top-0
           h-[100svh]
+          min-h-[560px]
           origin-bottom
           transform-gpu
           overflow-hidden
           bg-[#050505]
-          shadow-[0_-45px_130px_rgba(0,0,0,0.72)]
-          will-change-transform
+          shadow-[0_-24px_70px_rgba(0,0,0,0.48)]
         "
       >
         <div
@@ -1306,7 +1465,7 @@ export default function TheExperience() {
             pointer-events-none
             absolute
             inset-0
-            bg-[radial-gradient(circle_at_15%_20%,rgba(255,255,255,0.10),transparent_33%),radial-gradient(circle_at_88%_30%,rgba(255,255,255,0.07),transparent_34%),radial-gradient(circle_at_50%_100%,rgba(255,255,255,0.08),transparent_43%)]
+            bg-[radial-gradient(circle_at_15%_18%,rgba(255,255,255,0.075),transparent_32%),radial-gradient(circle_at_88%_28%,rgba(255,255,255,0.05),transparent_34%),radial-gradient(circle_at_50%_100%,rgba(255,255,255,0.05),transparent_42%)]
           "
         />
 
@@ -1315,28 +1474,9 @@ export default function TheExperience() {
             pointer-events-none
             absolute
             inset-0
-            opacity-[0.04]
-            [background-image:linear-gradient(rgba(255,255,255,0.6)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.6)_1px,transparent_1px)]
-            [background-size:64px_64px]
-          "
-        />
-
-        <motion.div
-          style={{
-            rotate: glowRotate,
-          }}
-          className="
-            pointer-events-none
-            absolute
-            left-1/2
-            top-1/2
-            h-[80vw]
-            w-[80vw]
-            -translate-x-1/2
-            -translate-y-1/2
-            rounded-full
-            bg-[conic-gradient(from_0deg,transparent,rgba(255,255,255,0.07),transparent,rgba(255,255,255,0.035),transparent)]
-            blur-[90px]
+            opacity-[0.025]
+            [background-image:linear-gradient(rgba(255,255,255,0.7)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.7)_1px,transparent_1px)]
+            [background-size:72px_72px]
           "
         />
 
@@ -1353,13 +1493,13 @@ export default function TheExperience() {
             hidden
             select-none
             whitespace-nowrap
-            text-[17vw]
+            text-[16vw]
             font-medium
             uppercase
             leading-none
             tracking-[-0.08em]
-            text-white/[0.018]
-            lg:block
+            text-white/[0.014]
+            xl:block
           "
         >
           Experience Experience Experience
@@ -1371,43 +1511,63 @@ export default function TheExperience() {
 
         <div className="relative z-10 h-full w-full">
           <motion.div
-            style={{
-              y: headerY,
-              scale: headerScale,
-            }}
+            style={
+              shouldReduceMotion
+                ? undefined
+                : {
+                    y: headerY,
+                    scale:
+                      headerScale,
+                  }
+            }
             className="
               absolute
               inset-x-4
-              top-[8%]
+              top-[6.5%]
               origin-left
               transform-gpu
-              sm:inset-x-7
-              sm:top-[9%]
+              sm:inset-x-6
+              sm:top-[7%]
+              md:inset-x-8
+              md:top-[7.5%]
               lg:left-[4%]
               lg:right-auto
-              lg:top-[6%]
+              lg:top-[5%]
               lg:w-[92%]
             "
           >
             <motion.div
-              style={{
-                opacity: eyebrowOpacity,
-                y: eyebrowY,
-              }}
-              className="mb-5 flex items-center gap-4 lg:mb-6"
+              style={
+                shouldReduceMotion
+                  ? undefined
+                  : {
+                      opacity:
+                        eyebrowOpacity,
+                      y: eyebrowY,
+                    }
+              }
+              className="
+                mb-3
+                flex
+                items-center
+                gap-3
+                sm:mb-4
+                lg:mb-5
+              "
             >
               <span
                 className="
-                  text-[9px]
+                  text-[8px]
                   font-medium
                   uppercase
-                  tracking-[0.42em]
+                  tracking-[0.36em]
                   text-white/45
-                  sm:text-[10px]
+                  sm:text-[9px]
                 "
                 style={{
                   fontFamily:
-                    cleanFont.style.fontFamily,
+                    cleanFont.style
+                      .fontFamily,
                 }}
               >
                 03
@@ -1416,27 +1576,29 @@ export default function TheExperience() {
               <span
                 className="
                   h-px
-                  w-14
+                  w-10
                   bg-gradient-to-r
-                  from-white/75
-                  via-neutral-300/50
-                  to-neutral-600/20
-                  sm:w-24
+                  from-white/65
+                  via-neutral-300/40
+                  to-neutral-600/10
+                  sm:w-16
+                  lg:w-20
                 "
               />
 
               <span
                 className="
-                  text-[9px]
+                  text-[8px]
                   font-medium
                   uppercase
-                  tracking-[0.36em]
+                  tracking-[0.32em]
                   text-white/40
-                  sm:text-[10px]
+                  sm:text-[9px]
                 "
                 style={{
                   fontFamily:
-                    cleanFont.style.fontFamily,
+                    cleanFont.style
+                      .fontFamily,
                 }}
               >
                 The Experience
@@ -1447,32 +1609,39 @@ export default function TheExperience() {
               className="
                 flex
                 flex-col
-                gap-4
+                gap-3
                 lg:flex-row
                 lg:items-end
                 lg:justify-between
               "
             >
               <motion.div
-                style={{
-                  opacity: headingOpacity,
-                  y: headingY,
-                  scale: headingScale,
-                }}
+                style={
+                  shouldReduceMotion
+                    ? undefined
+                    : {
+                        opacity:
+                          headingOpacity,
+                        y: headingY,
+                      }
+                }
                 className="origin-left"
               >
                 <p
                   className="
-                    mb-2
-                    text-[clamp(1.25rem,3vw,2.8rem)]
+                    mb-1
+                    text-[clamp(1.05rem,5vw,2.1rem)]
                     font-normal
                     italic
                     leading-none
-                    text-white/35
+                    text-white/34
+                    sm:text-[clamp(1.2rem,3vw,2.3rem)]
+                    lg:text-[clamp(1.35rem,2.2vw,2.6rem)]
                   "
                   style={{
                     fontFamily:
-                      luxuryFont.style.fontFamily,
+                      luxuryFont.style
+                        .fontFamily,
                   }}
                 >
                   Do not just hear it.
@@ -1480,23 +1649,29 @@ export default function TheExperience() {
 
                 <h2
                   className="
-                    text-[clamp(3.5rem,10vw,9rem)]
+                    max-w-[92vw]
+                    text-[clamp(2.75rem,13vw,5rem)]
                     font-medium
                     uppercase
-                    leading-[0.68]
-                    tracking-[-0.08em]
+                    leading-[0.72]
+                    tracking-[-0.07em]
                     text-white
+                    sm:text-[clamp(3.5rem,9vw,6.7rem)]
+                    md:text-[clamp(4rem,8vw,7.4rem)]
+                    lg:max-w-none
+                    lg:text-[clamp(4.2rem,6.2vw,8.2rem)]
                   "
                   style={{
                     fontFamily:
-                      luxuryFont.style.fontFamily,
+                      luxuryFont.style
+                        .fontFamily,
                   }}
                 >
                   What To
 
                   <span
                     className="
-                      ml-[0.14em]
+                      block
                       bg-gradient-to-r
                       from-white
                       via-neutral-200
@@ -1505,6 +1680,8 @@ export default function TheExperience() {
                       font-normal
                       italic
                       text-transparent
+                      sm:ml-[0.12em]
+                      sm:inline
                     "
                   >
                     Expect
@@ -1513,48 +1690,45 @@ export default function TheExperience() {
               </motion.div>
 
               <motion.div
-                style={{
-                  opacity: descriptionOpacity,
-                  y: descriptionY,
-                }}
+                style={
+                  shouldReduceMotion
+                    ? undefined
+                    : {
+                        opacity:
+                          descriptionOpacity,
+                      }
+                }
                 className="
                   hidden
-                  max-w-[380px]
+                  max-w-[350px]
                   pb-1
                   lg:block
+                  xl:max-w-[390px]
                 "
               >
-                <div className="mb-4 flex items-center gap-3">
-                  <motion.span
-                    animate={{
-                      scale: [0.7, 1.25, 0.7],
-                      opacity: [0.35, 1, 0.35],
-                    }}
-                    transition={{
-                      duration: 1.5,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
+                <div className="mb-3 flex items-center gap-3">
+                  <span
                     className="
-                      h-2
-                      w-2
+                      h-1.5
+                      w-1.5
                       rounded-full
                       bg-white
-                      shadow-[0_0_18px_rgba(255,255,255,0.75)]
+                      opacity-70
                     "
                   />
 
                   <span
                     className="
-                      text-[8px]
+                      text-[7px]
                       font-medium
                       uppercase
-                      tracking-[0.32em]
-                      text-white/35
+                      tracking-[0.28em]
+                      text-white/34
                     "
                     style={{
                       fontFamily:
-                        cleanFont.style.fontFamily,
+                        cleanFont.style
+                          .fontFamily,
                     }}
                   >
                     Scroll through the frequency
@@ -1563,13 +1737,16 @@ export default function TheExperience() {
 
                 <p
                   className="
-                    text-[12px]
-                    leading-6
-                    text-white/40
+                    text-[11px]
+                    leading-5
+                    text-white/38
+                    xl:text-[12px]
+                    xl:leading-6
                   "
                   style={{
                     fontFamily:
-                      cleanFont.style.fontFamily,
+                      cleanFont.style
+                        .fontFamily,
                   }}
                 >
                   Sound, lighting, movement and
@@ -1581,43 +1758,65 @@ export default function TheExperience() {
             </div>
           </motion.div>
 
-          <div className="hidden lg:block">
-            {experienceCards.map(
-              (card, index) => (
-                <DesktopScrollCard
-                  key={`desktop-${card.id}`}
-                  card={card}
-                  index={index}
-                  progress={progress}
-                  start={
-                    desktopRanges[index].start
-                  }
-                  end={
-                    desktopRanges[index].end
-                  }
-                />
-              ),
-            )}
-          </div>
-
-          <div className="lg:hidden">
-            {experienceCards.map(
-              (card, index) => (
-                <MobileScrollCard
-                  key={`mobile-${card.id}`}
-                  card={card}
-                  index={index}
-                  progress={progress}
-                  start={
-                    mobileRanges[index].start
-                  }
-                  end={
-                    mobileRanges[index].end
-                  }
-                />
-              ),
-            )}
-          </div>
+          {isDesktop ? (
+            <div>
+              {experienceCards.map(
+                (card, index) => (
+                  <DesktopScrollCard
+                    key={`desktop-${card.id}`}
+                    card={card}
+                    index={index}
+                    progress={progress}
+                    start={
+                      desktopRanges[
+                        index
+                      ].start
+                    }
+                    end={
+                      desktopRanges[
+                        index
+                      ].end
+                    }
+                    active={
+                      Math.abs(
+                        index -
+                          activeIndex,
+                      ) <= 1
+                    }
+                  />
+                ),
+              )}
+            </div>
+          ) : (
+            <div>
+              {experienceCards.map(
+                (card, index) => (
+                  <MobileScrollCard
+                    key={`mobile-${card.id}`}
+                    card={card}
+                    index={index}
+                    progress={progress}
+                    start={
+                      mobileRanges[
+                        index
+                      ].start
+                    }
+                    end={
+                      mobileRanges[
+                        index
+                      ].end
+                    }
+                    active={
+                      Math.abs(
+                        index -
+                          activeIndex,
+                      ) <= 1
+                    }
+                  />
+                ),
+              )}
+            </div>
+          )}
 
           <div
             className="
@@ -1625,17 +1824,18 @@ export default function TheExperience() {
               bottom-[4%]
               right-4
               hidden
-              h-[31%]
+              h-[28%]
               w-px
               overflow-hidden
               bg-white/10
-              sm:right-7
+              sm:right-6
               lg:block
             "
           >
             <motion.div
               style={{
-                height: progressHeight,
+                height:
+                  progressHeight,
               }}
               className="
                 absolute
@@ -1646,7 +1846,6 @@ export default function TheExperience() {
                 from-white
                 via-neutral-300
                 to-neutral-600
-                shadow-[0_0_12px_rgba(255,255,255,0.55)]
               "
             />
           </div>
@@ -1654,52 +1853,63 @@ export default function TheExperience() {
           <div
             className="
               absolute
-              bottom-[3%]
+              bottom-[2.5%]
               left-4
               right-4
               flex
               items-center
               justify-between
+              gap-4
               border-t
               border-white/10
-              pt-4
-              sm:left-7
-              sm:right-7
+              pt-3
+              sm:left-6
+              sm:right-6
+              md:left-8
+              md:right-8
               lg:hidden
             "
           >
             <span
               className="
-                text-[7px]
+                hidden
+                truncate
+                text-[6px]
                 font-medium
                 uppercase
-                tracking-[0.25em]
-                text-white/25
+                tracking-[0.20em]
+                text-white/24
+                min-[360px]:block
+                sm:text-[7px]
               "
               style={{
                 fontFamily:
-                  cleanFont.style.fontFamily,
+                  cleanFont.style
+                    .fontFamily,
               }}
             >
               Sound · Lights · Energy · Atmosphere
             </span>
 
-            <div className="flex items-center gap-2">
+            <div className="ml-auto flex shrink-0 items-center gap-2">
               {experienceCards.map(
                 (card, index) => (
-                  <motion.span
+                  <span
                     key={`indicator-${card.id}`}
-                    animate={{
-                      opacity: [0.2, 0.9, 0.2],
-                      scale: [0.8, 1.2, 0.8],
-                    }}
-                    transition={{
-                      duration: 1.7,
-                      delay: index * 0.18,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                    className="h-1 w-1 rounded-full bg-white"
+                    className={`
+                      h-1
+                      rounded-full
+                      bg-white
+                      transition-[width,opacity]
+                      duration-300
+
+                      ${
+                        index ===
+                        activeIndex
+                          ? "w-4 opacity-80"
+                          : "w-1 opacity-25"
+                      }
+                    `}
                   />
                 ),
               )}

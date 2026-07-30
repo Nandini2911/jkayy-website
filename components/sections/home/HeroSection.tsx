@@ -11,7 +11,7 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const HERO_VIDEO_URL =
-  "https://res.cloudinary.com/dl9zkv77/video/upload/Untitled_design_awrbkq.mp4";
+  "https://cdn.shopify.com/videos/c/o/v/18e7631a877343db9e558534585a1b5e.mp4";
 
 export default function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null);

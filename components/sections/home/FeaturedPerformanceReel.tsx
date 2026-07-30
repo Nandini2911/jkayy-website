@@ -9,11 +9,11 @@ import {
 
 // Desktop and tablet video
 const DESKTOP_CLOUDINARY_VIDEO_URL =
-  "https://player.cloudinary.com/embed/?cloud_name=dl9zkv77&public_id=Untitled_design_2_ftmu1d";
+  "https://cdn.shopify.com/videos/c/o/v/565ecb0878e04842a3f53a5bf3e7f2be.mp4";
 
 // Mobile video
 const MOBILE_CLOUDINARY_VIDEO_URL =
-  "https://player.cloudinary.com/embed/?cloud_name=dl9zkv77&public_id=2e39652c-6c4f-4c82-94a4-8b982d3ce785_m2vatb";
+  "https://cdn.shopify.com/videos/c/o/v/e338409bd12d480f9f7019d735dd9721.mp4";
 
 const SECTION_BACKGROUND_IMAGE =
   "/images/COVAH The Cavern.webp";

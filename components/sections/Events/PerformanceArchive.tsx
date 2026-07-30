@@ -4,6 +4,8 @@ import {
   motion,
   useInView,
   useReducedMotion,
+  useScroll,
+  useTransform,
 } from "motion/react";
 import {
   Cormorant_Garamond,
@@ -15,7 +17,7 @@ import {
   useState,
 } from "react";
 
-const luxuryFont = Cormorant_Garamond({
+const displayFont = Cormorant_Garamond({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
   style: ["normal", "italic"],
@@ -28,389 +30,380 @@ const cleanFont = Manrope({
   display: "swap",
 });
 
-const premiumEase = [0.16, 1, 0.3, 1] as const;
+const ease = [0.16, 1, 0.3, 1] as const;
 
-type PerformanceHighlight = {
+type ClubEvent = {
   category: string;
   title: string;
   location: string;
   video: string;
-  poster?: string;
 };
 
-const performanceHighlights: PerformanceHighlight[] = [
+const events: ClubEvent[] = [
   {
-    category: "Festival",
-    title: "Sunburn Festival",
+    category: "Club Event",
+    title: "Festival Set",
     location: "Delhi",
     video:
       "https://res.cloudinary.com/dl9zkv77/video/upload/v1784805159/hy.press_eqtxj2.mp4",
-    
   },
   {
-    category: "Nightclub",
-    title: "Midnight Sessions",
+    category: "Club Event",
+    title: "Midnight Set",
     location: "Mumbai",
     video:
       "https://res.cloudinary.com/dl9zkv77/video/upload/v1784635508/jkayyofficial_9_fyhuq8.mp4",
-
   },
   {
-    category: "Wedding",
-    title: "Luxury Wedding",
+    category: "Club Event",
+    title: "Peak Hour",
     location: "Goa",
     video:
-      "https://res.cloudinary.com/dl9zkv77/video/upload/v1784537175/jkayyofficial_4_sdexiy.mp4",
-
+      "https://cdn.shopify.com/videos/c/o/v/565ecb0878e04842a3f53a5bf3e7f2be.mp4",
   },
   {
-    category: "Corporate",
-    title: "Private Brand Experience",
+    category: "Club Event",
+    title: "Main Floor",
     location: "Noida",
     video:
-      "https://res.cloudinary.com/dl9zkv77/video/upload/v1784180733/2e39652c-6c4f-4c82-94a4-8b982d3ce785_m2vatb.mp4",
-
+      "https://cdn.shopify.com/videos/c/o/v/18e7631a877343db9e558534585a1b5e.mp4",
   },
   {
-    category: "Wedding",
-    title: "Luxury Wedding",
+    category: "Club Event",
+    title: "After Hours",
     location: "Goa",
     video:
-      "https://res.cloudinary.com/dl9zkv77/video/upload/v1784724758/jkayyofficial_12_w4nzbe.mp4",
-  
+      "https://cdn.shopify.com/videos/c/o/v/7bb9912065244711ae0e22b8ce8c58a1.mp4",
   },
   {
-    category: "Corporate",
-    title: "Private Brand Experience",
+    category: "Club Event",
+    title: "Closing Set",
     location: "Noida",
     video:
-      "https://res.cloudinary.com/dl9zkv77/video/upload/v1784537173/jkayyofficial_2_h963q1.mp4",
-   
+      "https://cdn.shopify.com/videos/c/o/v/bf840fbaf4f340ce8952a863dbb2c2ba.mp4",
+  },
+   {
+    category: "Club Event",
+    title: "Main Floor",
+    location: "Noida",
+    video:
+      "https://cdn.shopify.com/videos/c/o/v/e338409bd12d480f9f7019d735dd9721.mp4",
+  },
+  {
+    category: "Club Event",
+    title: "After Hours",
+    location: "Goa",
+    video:
+      "https://cdn.shopify.com/videos/c/o/v/d3bc88e3a9a049bd89340de260f2aa44.mp4",
+  },
+  {
+    category: "Club Event",
+    title: "Closing Set",
+    location: "Noida",
+    video:
+      "https://cdn.shopify.com/videos/c/o/v/a1f57461ad2c4b4fad6c605c36f64ae6.mp4",
   },
 ];
 
-function HighlightCard({
-  item,
-  index,
-  finale = false,
-}: {
-  item: PerformanceHighlight;
-  index: number;
-  finale?: boolean;
-}) {
-  const cardRef = useRef<HTMLDivElement | null>(null);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-
-  const [hasRequestedVideo, setHasRequestedVideo] =
-    useState(false);
-  const [videoIsReady, setVideoIsReady] = useState(false);
-
-  const shouldReduceMotion = useReducedMotion();
-
-  /*
-    Load a video shortly before its card reaches the viewport.
-    Once requested, the source remains attached so reverse scrolling
-    does not force the browser to download the video again.
-  */
-  const isNearViewport = useInView(cardRef, {
-    margin: "650px 0px 650px 0px",
-    amount: 0,
-  });
-
-  /*
-    Only play videos that are meaningfully visible.
-    This prevents all six videos from decoding simultaneously.
-  */
-  const isActivelyVisible = useInView(cardRef, {
-    margin: "-12% 0px -12% 0px",
-    amount: 0.12,
-  });
-
-  const comesFromLeft = index % 2 === 0;
+function useIsMobileScreen() {
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    if (isNearViewport) {
-      setHasRequestedVideo(true);
+    const media = window.matchMedia("(max-width: 639px)");
+
+    const update = () => {
+      setIsMobile(media.matches);
+    };
+
+    update();
+
+    if (media.addEventListener) {
+      media.addEventListener("change", update);
+
+      return () => {
+        media.removeEventListener("change", update);
+      };
     }
-  }, [isNearViewport]);
+
+    media.addListener(update);
+
+    return () => {
+      media.removeListener(update);
+    };
+  }, []);
+
+  return isMobile;
+}
+
+function EventCard({
+  item,
+  index,
+  isMobile,
+}: {
+  item: ClubEvent;
+  index: number;
+  isMobile: boolean;
+}) {
+  const cardRef = useRef<HTMLElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [ready, setReady] = useState(false);
+  const [playing, setPlaying] = useState(false);
+
+  const mobileEntered = useInView(cardRef, {
+    once: true,
+    amount: 0.16,
+    margin: "0px 0px -7% 0px",
+  });
 
   useEffect(() => {
     const video = videoRef.current;
 
-    if (!video || !hasRequestedVideo) return;
+    if (!video) {
+      return;
+    }
 
-    const syncPlayback = () => {
-      const shouldPlay =
-        isActivelyVisible &&
-        !document.hidden &&
-        !shouldReduceMotion;
+    video.preload = "metadata";
+    video.load();
 
-      if (!shouldPlay) {
+    const handleVisibility = () => {
+      if (document.hidden) {
         video.pause();
-        return;
-      }
-
-      const playPromise = video.play();
-
-      if (playPromise !== undefined) {
-        playPromise.catch(() => {
-          // Muted inline autoplay can still be temporarily blocked.
-        });
+        video.muted = true;
+        setPlaying(false);
       }
     };
 
-    syncPlayback();
-    document.addEventListener("visibilitychange", syncPlayback);
+    document.addEventListener("visibilitychange", handleVisibility);
 
     return () => {
       document.removeEventListener(
         "visibilitychange",
-        syncPlayback,
+        handleVisibility,
       );
       video.pause();
     };
-  }, [
-    hasRequestedVideo,
-    isActivelyVisible,
-    shouldReduceMotion,
-  ]);
+  }, []);
+
+  const play = () => {
+    const video = videoRef.current;
+
+    if (!video) {
+      return;
+    }
+
+    setPlaying(true);
+    video.muted = true;
+    video.defaultMuted = true;
+    video.volume = 0;
+
+    video.play().catch(() => undefined);
+  };
+
+  const pause = () => {
+    const video = videoRef.current;
+
+    setPlaying(false);
+
+    if (!video) {
+      return;
+    }
+
+    video.pause();
+    video.muted = true;
+    video.defaultMuted = true;
+  };
+
+  const toggleMobile = () => {
+    if (
+      typeof window === "undefined" ||
+      !window.matchMedia("(hover: none)").matches
+    ) {
+      return;
+    }
+
+    if (videoRef.current?.paused) {
+      play();
+    } else {
+      pause();
+    }
+  };
 
   return (
-    <motion.div
+    <motion.article
       ref={cardRef}
-      initial={
-        shouldReduceMotion
-          ? false
+      initial={false}
+      animate={
+        isMobile
+          ? {
+              opacity: mobileEntered ? 1 : 0,
+              x: mobileEntered
+                ? 0
+                : index % 2 === 0
+                  ? -52
+                  : 52,
+              y: mobileEntered ? 0 : 14,
+              scale: mobileEntered ? 1 : 0.985,
+            }
           : {
-              opacity: 0,
-              x: comesFromLeft ? -72 : 72,
+              opacity: 1,
+              x: 0,
+              y: 0,
+              scale: 1,
             }
       }
-      whileInView={{
-        opacity: 1,
-        x: 0,
-      }}
-      viewport={{
-        once: true,
-        amount: 0.12,
-        margin: "0px 0px -6% 0px",
-      }}
       transition={{
-        duration: shouldReduceMotion ? 0 : 0.9,
-        delay: shouldReduceMotion
-          ? 0
-          : index % 2 === 0
-            ? 0
-            : 0.08,
-        ease: premiumEase,
+        duration: isMobile ? 0.72 : 0,
+        ease,
+        delay: isMobile ? (index % 3) * 0.035 : 0,
       }}
-      className={`
+      onMouseEnter={play}
+      onMouseLeave={pause}
+      onClick={toggleMobile}
+      className="
         group
         relative
-        isolate
+        aspect-[4/5]
+        w-full
+        max-w-[430px]
+        min-w-0
+        shrink-0
+        sm:max-w-none
+        cursor-pointer
         overflow-hidden
+        rounded-[18px]
+        border
+        sm:rounded-[26px]
+        border-white/[0.11]
         bg-[#090909]
-        [backface-visibility:hidden]
-
-        ${
-          finale
-            ? "h-full min-h-0"
-            : "aspect-[4/5] min-h-[500px] sm:aspect-[16/11] sm:min-h-[560px] md:aspect-[4/3] md:min-h-0 xl:aspect-[16/10]"
-        }
-      `}
+        shadow-[0_30px_90px_rgba(0,0,0,0.34)]
+        lg:w-[31vw]
+        lg:max-w-[520px]
+        xl:w-[29vw]
+      "
+      style={{
+        transform: "translateZ(0)",
+        backfaceVisibility: "hidden",
+      }}
     >
-      {/* Stable poster layer prevents a black flash while video loads. */}
       <div
         aria-hidden="true"
         className="
           absolute
           inset-0
-          scale-[1.01]
-          bg-[#0b0b0b]
-          bg-cover
-          bg-center
+          bg-[radial-gradient(circle_at_50%_35%,#1d1d1d_0%,#0a0a0a_58%,#050505_100%)]
         "
-        style={
-          item.poster
-            ? {
-                backgroundImage: `url(${item.poster})`,
-              }
-            : undefined
-        }
       />
 
       <video
         ref={videoRef}
-        src={hasRequestedVideo ? item.video : undefined}
-        poster={item.poster}
+        src={item.video}
         muted
         loop
         playsInline
         preload="metadata"
         disablePictureInPicture
         disableRemotePlayback
-        tabIndex={-1}
-        onLoadedData={() => setVideoIsReady(true)}
-        onCanPlay={() => setVideoIsReady(true)}
-        onError={() => setVideoIsReady(false)}
+        onLoadedMetadata={() => {
+          const video = videoRef.current;
+
+          if (
+            video &&
+            Number.isFinite(video.duration) &&
+            video.duration > 0
+          ) {
+            try {
+              video.currentTime = Math.min(
+                0.01,
+                video.duration,
+              );
+            } catch {
+              // Browser may wait for more buffered data.
+            }
+          }
+        }}
+        onLoadedData={() => setReady(true)}
+        onCanPlay={() => setReady(true)}
+        onError={() => setReady(false)}
         className={`
           absolute
           inset-0
           h-full
           w-full
-          scale-[1.01]
           object-cover
-          transition-[opacity,transform]
+          transition-[opacity,transform,filter]
           duration-700
           ease-out
-          [backface-visibility:hidden]
-          motion-reduce:transition-none
-          md:duration-[1200ms]
-          md:group-hover:scale-[1.035]
+          group-hover:scale-[1.035]
+          group-hover:brightness-[0.9]
 
-          ${videoIsReady ? "opacity-100" : "opacity-0"}
+          ${ready ? "opacity-100" : "opacity-0"}
         `}
       />
 
       <div
+        aria-hidden="true"
         className="
           pointer-events-none
           absolute
           inset-0
-          bg-black/10
-          transition-colors
-          duration-500
-          motion-reduce:transition-none
-          md:group-hover:bg-black/25
+          bg-[linear-gradient(180deg,rgba(0,0,0,0.04)_0%,rgba(0,0,0,0.02)_40%,rgba(0,0,0,0.76)_100%)]
         "
       />
 
       <div
         className="
-          pointer-events-none
           absolute
-          inset-0
-          bg-gradient-to-t
-          from-black/90
-          via-black/10
-          to-black/25
-          opacity-100
-          transition-opacity
-          duration-500
-          motion-reduce:transition-none
-          md:opacity-65
-          md:group-hover:opacity-100
-        "
-      />
-
-      {!shouldReduceMotion && (
-        <motion.div
-          aria-hidden="true"
-          animate={
-            isActivelyVisible
-              ? {
-                  x: ["-150%", "180%"],
-                  opacity: [0, 0.16, 0],
-                }
-              : {
-                  opacity: 0,
-                }
-          }
-          transition={{
-            duration: 7.5,
-            delay: (index % 2) * 0.6,
-            repeat: Infinity,
-            repeatDelay: 2,
-            ease: "linear",
-          }}
-          className="
-            pointer-events-none
-            absolute
-            inset-y-0
-            left-0
-            hidden
-            w-[18%]
-            -skew-x-12
-            bg-gradient-to-r
-            from-transparent
-            via-white/12
-            to-transparent
-            blur-lg
-            lg:block
-          "
-        />
-      )}
-
-      <div
-        className="
-          absolute
-          inset-x-0
-          top-0
-          z-10
+          left-4
+          top-4
+          z-20
           flex
-          items-start
-          justify-between
-          p-[clamp(1.1rem,3vw,2rem)]
+          items-center
+          gap-2.5
+          rounded-full
+          border
+          border-white/15
+          bg-black/35
+          px-3
+          py-2
+          backdrop-blur-md
+          sm:left-5
+          sm:top-5
         "
       >
-        <p
+        <span
+          className={`
+            h-1.5
+            w-1.5
+            rounded-full
+            ${
+              playing
+                ? "bg-white shadow-[0_0_12px_rgba(255,255,255,0.95)]"
+                : "bg-white/45"
+            }
+          `}
+        />
+
+        <span
           className="
-            text-[9px]
-            font-medium
+            text-[7px]
+            font-semibold
             uppercase
-            tracking-[0.34em]
-            text-white/75
-            sm:text-[10px]
+            tracking-[0.28em]
+            text-white/68
           "
           style={{
             fontFamily: cleanFont.style.fontFamily,
           }}
         >
-         
-        </p>
-
-        <div className="flex items-center gap-2">
-          <motion.span
-            animate={
-              isActivelyVisible && !shouldReduceMotion
-                ? {
-                    opacity: [0.35, 1, 0.35],
-                    scale: [0.8, 1.2, 0.8],
-                  }
-                : {
-                    opacity: 0.5,
-                    scale: 1,
-                  }
-            }
-            transition={{
-              duration: 1.8,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-            className="
-              h-1.5
-              w-1.5
-              rounded-full
-              bg-white
-              shadow-[0_0_12px_rgba(255,255,255,0.9)]
-            "
-          />
-
-          <span
-            className="
-              text-[8px]
-              font-medium
-              uppercase
-              tracking-[0.3em]
-              text-white/65
-            "
-            style={{
-              fontFamily: cleanFont.style.fontFamily,
-            }}
-          >
-            Playing
-          </span>
-        </div>
+          {playing ? (
+            "Playing muted"
+          ) : (
+            <>
+              <span className="sm:hidden">Tap to play</span>
+              <span className="hidden sm:inline">Hover to play</span>
+            </>
+          )}
+        </span>
       </div>
 
       <div
@@ -418,168 +411,118 @@ function HighlightCard({
           absolute
           inset-x-0
           bottom-0
-          z-10
-          p-[clamp(1.1rem,3vw,2rem)]
+          z-20
+          p-4
+          sm:p-6
+          lg:p-7
         "
       >
         <div
           className="
-            translate-y-0
-            opacity-100
-            transition-[transform,opacity]
-            duration-500
-            ease-out
-            motion-reduce:transition-none
-            md:translate-y-5
-            md:opacity-0
-            md:group-hover:translate-y-0
-            md:group-hover:opacity-100
+            mb-2.5
+            flex
+            items-center
+            gap-3
+            text-[7px]
+            font-semibold
+            uppercase
+            tracking-[0.3em]
+            text-white/46
+            sm:text-[8px]
           "
+          style={{
+            fontFamily: cleanFont.style.fontFamily,
+          }}
         >
-          <p
-            className="
-              mb-3
-              text-[9px]
-              font-medium
-              uppercase
-              tracking-[0.38em]
-              text-white/55
-              sm:text-[10px]
-            "
-            style={{
-              fontFamily: cleanFont.style.fontFamily,
-            }}
-          >
-            {item.category}
-          </p>
-
-          <div className="flex items-end justify-between gap-4 sm:gap-5">
-            <div className="min-w-0 flex-1">
-              <h3
-                className="
-                  max-w-[98%]
-                  break-words
-                  text-[clamp(2.15rem,6.2vw,5.75rem)]
-                  font-medium
-                  leading-[0.87]
-                  tracking-[-0.055em]
-                  text-white
-                  md:text-[clamp(2.5rem,4.6vw,5.75rem)]
-                "
-                style={{
-                  fontFamily: luxuryFont.style.fontFamily,
-                }}
-              >
-                {item.title}
-              </h3>
-
-              <p
-                className="
-                  mt-4
-                  text-[9px]
-                  font-medium
-                  uppercase
-                  tracking-[0.32em]
-                  text-white/55
-                  sm:text-[10px]
-                "
-                style={{
-                  fontFamily: cleanFont.style.fontFamily,
-                }}
-              >
-                {item.location}
-              </p>
-            </div>
-
-            <div
-              aria-hidden="true"
-              className="
-                hidden
-                h-12
-                w-12
-                shrink-0
-                items-center
-                justify-center
-                rounded-full
-                border
-                border-white/25
-                text-white
-                transition-[background-color,border-color,color]
-                duration-400
-                motion-reduce:transition-none
-                sm:flex
-                lg:h-14
-                lg:w-14
-                md:group-hover:border-white
-                md:group-hover:bg-white
-                md:group-hover:text-black
-              "
-            >
-              <span className="text-lg">↗</span>
-            </div>
-          </div>
+          <span>{item.location}</span>
+          <span className="h-px w-7 bg-white/20" />
+          <span>{String(index + 1).padStart(2, "0")}</span>
         </div>
-      </div>
 
-      <div
-        className="
-          pointer-events-none
-          absolute
-          bottom-0
-          left-0
-          h-px
-          w-full
-          overflow-hidden
-          bg-white/15
-        "
-      >
-        {!shouldReduceMotion && (
-          <motion.div
-            animate={
-              isActivelyVisible
-                ? {
-                    x: ["-110%", "110%"],
-                  }
-                : {
-                    x: "-110%",
-                  }
-            }
-            transition={{
-              duration: 4.8,
-              delay: (index % 2) * 0.3,
-              repeat: Infinity,
-              repeatDelay: 0.8,
-              ease: "easeInOut",
-            }}
-            className="
-              h-full
-              w-full
-              bg-gradient-to-r
-              from-transparent
-              via-white
-              to-transparent
-              shadow-[0_0_12px_rgba(255,255,255,0.9)]
-            "
-          />
-        )}
+        <h3
+          className="
+            text-[clamp(2.15rem,11vw,3.15rem)]
+            font-medium
+            sm:text-[clamp(2.6rem,7vw,4.9rem)]
+            leading-[0.82]
+            tracking-[-0.055em]
+            text-white
+            lg:text-[clamp(3.1rem,3.9vw,4.9rem)]
+          "
+          style={{
+            fontFamily: displayFont.style.fontFamily,
+          }}
+        >
+          {item.title}
+        </h3>
       </div>
-    </motion.div>
+    </motion.article>
   );
 }
 
-export default function PerformanceHighlights() {
-  const shouldReduceMotion = useReducedMotion();
+export default function PerformanceArchive() {
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const reduceMotion = useReducedMotion();
+  const isMobile = useIsMobileScreen();
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end end"],
+  });
+
+  const rowOneX = useTransform(
+    scrollYProgress,
+    [0, 1],
+    ["7%", "-10%"],
+  );
+
+  const rowTwoX = useTransform(
+    scrollYProgress,
+    [0, 1],
+    ["-8%", "9%"],
+  );
+
+  const rowOneY = useTransform(
+    scrollYProgress,
+    [0, 0.5, 1],
+    [0, -10, -18],
+  );
+
+  const rowTwoY = useTransform(
+    scrollYProgress,
+    [0, 0.5, 1],
+    [0, -24, -46],
+  );
+
+  const rowThreeX = useTransform(
+    scrollYProgress,
+    [0, 1],
+    ["6%", "-8%"],
+  );
+
+  const rowThreeY = useTransform(
+    scrollYProgress,
+    [0, 0.5, 1],
+    [0, -38, -72],
+  );
+
+  const topRow = events.slice(0, 3);
+  const middleRow = events.slice(3, 6);
+  const bottomRow = events.slice(6, 9);
 
   return (
     <section
+      ref={sectionRef}
       id="performance-highlights"
       className="
         relative
         z-10
         isolate
         overflow-x-hidden
-        bg-[#030303]
+        bg-[#050505]
         text-white
+        sm:overflow-x-visible
+        lg:min-h-[225vh]
       "
     >
       <div
@@ -587,13 +530,11 @@ export default function PerformanceHighlights() {
         className="
           pointer-events-none
           absolute
-          inset-x-0
-          top-0
-          h-[55svh]
+          inset-0
         "
         style={{
           background:
-            "radial-gradient(circle at 50% 0%, rgba(255,255,255,0.08), transparent 58%)",
+            "radial-gradient(circle at 50% 0%, rgba(255,255,255,0.05), transparent 30%), #050505",
         }}
       />
 
@@ -604,24 +545,30 @@ export default function PerformanceHighlights() {
           mx-auto
           max-w-[1800px]
           px-4
-          pb-14
-          pt-20
+          pb-16
+          pt-16
           sm:px-7
-          sm:pb-20
+          sm:pb-28
           sm:pt-28
+          lg:sticky
+          lg:top-0
+          lg:flex
+          lg:min-h-screen
+          lg:flex-col
+          lg:justify-center
+          lg:overflow-hidden
           lg:px-12
-          lg:pb-24
-          lg:pt-36
+          lg:py-16
           2xl:px-16
         "
       >
-        <motion.div
+        <motion.header
           initial={
-            shouldReduceMotion
+            reduceMotion
               ? false
               : {
                   opacity: 0,
-                  y: 28,
+                  y: 24,
                 }
           }
           whileInView={{
@@ -630,299 +577,250 @@ export default function PerformanceHighlights() {
           }}
           viewport={{
             once: true,
-            amount: 0.25,
+            amount: 0.3,
           }}
           transition={{
-            duration: shouldReduceMotion ? 0 : 0.85,
-            ease: premiumEase,
+            duration: reduceMotion ? 0 : 0.7,
+            ease,
           }}
           className="
+            mb-10
             flex
             flex-col
-            justify-between
-            gap-10
-            lg:flex-row
-            lg:items-end
-            lg:gap-16
+            items-center
+            gap-5
+            border-b
+            border-white/10
+            pb-8
+            text-center
+            sm:mb-12
+            sm:flex-row
+            sm:items-end
+            sm:justify-between
+            sm:gap-6
+            sm:pb-10
+            sm:text-left
+            lg:mb-9
           "
         >
-          <div className="min-w-0">
-          
-             
-
-              <span className="h-px w-12 bg-white/25 sm:w-20" />
+          <div>
+            <div className="mb-5 flex items-center justify-center gap-3 sm:justify-start sm:gap-4">
+              <span className="h-px w-10 bg-white/30 sm:w-14" />
 
               <span
                 className="
-                  text-[9px]
-                  font-medium
+                  text-[8px]
+                  font-semibold
                   uppercase
                   tracking-[0.38em]
-                  text-white/45
-                  sm:text-[10px]
+                  text-white/42
+                  sm:text-[9px]
                 "
                 style={{
                   fontFamily: cleanFont.style.fontFamily,
                 }}
               >
-                Selected moments
+                Selected club moments
               </span>
-          
-
-            <p
-              className="
-                mb-2
-                text-[clamp(1.5rem,4.6vw,3.8rem)]
-                font-normal
-                italic
-                leading-none
-                text-white/40
-              "
-              style={{
-                fontFamily: luxuryFont.style.fontFamily,
-              }}
-            >
-              Six moments.
-            </p>
+            </div>
 
             <h2
               className="
-                max-w-full
-                text-[clamp(3.15rem,14vw,11rem)]
+                whitespace-nowrap
+                text-[clamp(2.75rem,13vw,3.8rem)]
                 font-medium
-                uppercase
-                leading-[0.76]
-                tracking-[-0.075em]
+                leading-[0.82]
+                tracking-[-0.065em]
                 text-white
-                sm:text-[clamp(4rem,11vw,11rem)]
-                lg:text-[clamp(5.5rem,9vw,11rem)]
+                sm:whitespace-normal
+                sm:text-[clamp(4.8rem,10vw,8.4rem)]
+                sm:leading-[0.75]
+                sm:tracking-[-0.075em]
+                lg:text-[clamp(5rem,6vw,8.4rem)]
               "
               style={{
-                fontFamily: luxuryFont.style.fontFamily,
+                fontFamily: displayFont.style.fontFamily,
               }}
             >
-              Performance
-              <br />
-
-              <span className="font-normal italic text-white/55">
-                Highlights
+              Club
+              <span className="ml-[0.1em] font-normal italic text-white/45 sm:ml-[0.12em]">
+                Nights
               </span>
             </h2>
           </div>
 
-          <div className="flex max-w-md flex-col gap-5 lg:pb-2">
-            <p
-              className="
-                text-[12px]
-                font-normal
-                leading-6
-                text-white/45
-                sm:text-[14px]
-                sm:leading-7
-              "
-              style={{
-                fontFamily: cleanFont.style.fontFamily,
-              }}
-            >
-              From festival stages and intimate clubs to destination weddings
-              and private brand experiences.
-            </p>
-
-            <p
-              className="
-                hidden
-                text-[8px]
-                font-medium
-                uppercase
-                tracking-[0.34em]
-                text-white/30
-                md:block
-                sm:text-[9px]
-              "
-              style={{
-                fontFamily: cleanFont.style.fontFamily,
-              }}
-            >
-              Hover to reveal each performance
-            </p>
-          </div>
-        </motion.div>
-      </div>
-
-      <div className="border-y border-white/10">
-        <div
-          className="
-            relative
-            z-10
-            mx-auto
-            grid
-            max-w-[1920px]
-            grid-cols-1
-            overflow-hidden
-            md:grid-cols-2
-          "
-        >
-          {performanceHighlights
-            .slice(0, 4)
-            .map((item, index) => {
-              const isLeftDesktopCard = index % 2 === 0;
-
-              return (
-                <div
-                  key={`${item.category}-${item.title}-${item.location}-${index}`}
-                  className={`
-                    overflow-hidden
-                    border-b
-                    border-white/10
-
-                    ${
-                      isLeftDesktopCard
-                        ? "md:border-r"
-                        : "md:border-r-0"
-                    }
-                  `}
-                >
-                  <HighlightCard
-                    item={item}
-                    index={index}
-                  />
-                </div>
-              );
-            })}
-        </div>
-      </div>
-
-      {/*
-        The final row remains pinned while the following experience
-        section rises over it. svh is intentionally used here because
-        it does not resize continuously as mobile browser chrome moves.
-      */}
-      <div className="relative z-10 h-[185svh] sm:h-[195svh] lg:h-[200svh]">
-        <div
-          className="
-            sticky
-            top-0
-            h-[100svh]
-            overflow-hidden
-            border-b
-            border-white/10
-            bg-[#030303]
-          "
-        >
-          <div
+          <p
             className="
               mx-auto
+              max-w-[330px]
+              text-center
+              text-[11px]
+              leading-5
+              text-white/42
+              sm:mx-0
+              sm:max-w-[390px]
+              sm:text-left
+              sm:text-[13px]
+              sm:leading-6
+            "
+            style={{
+              fontFamily: cleanFont.style.fontFamily,
+            }}
+          >
+            <span className="sm:hidden">
+              Nine club moments, crafted for a clean mobile experience.
+            </span>
+            <span className="hidden sm:inline">
+              Three rows. Nine club moments. Scroll through the energy as
+              each row crosses the next in a subtle luxury motion.
+            </span>
+          </p>
+        </motion.header>
+
+        <div className="relative">
+          <motion.div
+            style={{
+              x: reduceMotion || isMobile ? 0 : rowOneX,
+              y: reduceMotion || isMobile ? 0 : rowOneY,
+            }}
+            className="
+              relative
+              z-10
               grid
-              h-full
-              max-w-[1920px]
               grid-cols-1
-              grid-rows-2
-              md:grid-cols-2
-              md:grid-rows-1
+              justify-items-center
+              gap-4
+              sm:grid-cols-3
+              sm:justify-items-stretch
+              sm:gap-5
+              lg:flex
+              lg:w-max
+              lg:gap-5
+              xl:gap-6
             "
           >
-            {performanceHighlights
-              .slice(4)
-              .map((item, finalIndex) => {
-                const index = finalIndex + 4;
+            {topRow.map((item, index) => (
+              <EventCard
+                key={`${item.title}-${index}`}
+                item={item}
+                index={index}
+                isMobile={isMobile}
+              />
+            ))}
+          </motion.div>
 
-                return (
-                  <div
-                    key={`${item.category}-${item.title}-${item.location}-${index}`}
-                    className={`
-                      h-full
-                      min-h-0
-                      overflow-hidden
-                      border-white/10
-
-                      ${
-                        finalIndex === 0
-                          ? "border-b md:border-b-0 md:border-r"
-                          : ""
-                      }
-                    `}
-                  >
-                    <HighlightCard
-                      item={item}
-                      index={index}
-                      finale
-                    />
-                  </div>
-                );
-              })}
-          </div>
-
-          <div
-            aria-hidden="true"
+          <motion.div
+            style={{
+              x: reduceMotion || isMobile ? 0 : rowTwoX,
+              y: reduceMotion || isMobile ? 0 : rowTwoY,
+            }}
             className="
-              pointer-events-none
-              absolute
-              inset-0
+              relative
               z-20
-              bg-gradient-to-t
-              from-black/35
-              via-transparent
-              to-black/10
-            "
-          />
-
-          <div
-            className="
-              pointer-events-none
-              absolute
-              bottom-[max(1.25rem,env(safe-area-inset-bottom))]
-              left-1/2
-              z-30
-              flex
-              max-w-[calc(100%-2rem)]
-              -translate-x-1/2
-              items-center
-              gap-3
-              whitespace-nowrap
-              rounded-full
-              border
-              border-white/10
-              bg-black/70
-              px-4
-              py-2.5
-              sm:bottom-[max(2rem,env(safe-area-inset-bottom))]
+              mt-4
+              grid
+              grid-cols-1
+              justify-items-center
+              gap-4
+              sm:grid-cols-3
+              sm:justify-items-stretch
+              sm:gap-5
+              lg:-mt-[7vw]
+              lg:ml-auto
+              lg:flex
+              lg:w-max
+              lg:gap-5
+              xl:-mt-[6vw]
+              xl:gap-6
             "
           >
-            <motion.span
-              animate={
-                shouldReduceMotion
-                  ? undefined
-                  : {
-                      y: [0, 4, 0],
-                      opacity: [0.4, 1, 0.4],
-                    }
-              }
-              transition={{
-                duration: 1.5,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-              className="text-xs text-white/60"
-            >
-              ↓
-            </motion.span>
+            {middleRow.map((item, localIndex) => (
+              <EventCard
+                key={`${item.title}-${localIndex + 3}`}
+                item={item}
+                index={localIndex + 3}
+                isMobile={isMobile}
+              />
+            ))}
+          </motion.div>
 
+          <motion.div
+            style={{
+              x: reduceMotion || isMobile ? 0 : rowThreeX,
+              y: reduceMotion || isMobile ? 0 : rowThreeY,
+            }}
+            className="
+              relative
+              z-30
+              mt-4
+              grid
+              grid-cols-1
+              justify-items-center
+              gap-4
+              sm:grid-cols-3
+              sm:justify-items-stretch
+              sm:gap-5
+              lg:-mt-[7vw]
+              lg:flex
+              lg:w-max
+              lg:gap-5
+              xl:-mt-[6vw]
+              xl:gap-6
+            "
+          >
+            {bottomRow.map((item, localIndex) => (
+              <EventCard
+                key={`${item.title}-${localIndex + 6}`}
+                item={item}
+                index={localIndex + 6}
+                isMobile={isMobile}
+              />
+            ))}
+          </motion.div>
+        </div>
+
+        <div
+          className="
+            mt-8
+            hidden
+            items-center
+            justify-between
+            border-t
+            border-white/[0.08]
+            pt-5
+            lg:flex
+          "
+        >
+          <span
+            className="
+              text-[7px]
+              font-semibold
+              uppercase
+              tracking-[0.32em]
+              text-white/24
+            "
+            style={{
+              fontFamily: cleanFont.style.fontFamily,
+            }}
+          >
+            Scroll to explore
+          </span>
+
+          <div className="flex items-center gap-3">
+            <span className="h-px w-10 bg-white/16" />
             <span
               className="
-                truncate
-                text-[8px]
-                font-medium
+                text-[7px]
+                font-semibold
                 uppercase
-                tracking-[0.24em]
-                text-white/45
-                sm:text-[9px]
-                sm:tracking-[0.28em]
+                tracking-[0.32em]
+                text-white/24
               "
               style={{
                 fontFamily: cleanFont.style.fontFamily,
               }}
             >
-              Enter the experience
+              01 — 09
             </span>
           </div>
         </div>

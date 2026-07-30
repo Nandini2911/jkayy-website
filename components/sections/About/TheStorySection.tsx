@@ -858,7 +858,7 @@ export default function TheStorySection() {
                       luxuryFont.style.fontFamily,
                   }}
                 >
-                  Music isn&apos;t just heard —{" "}
+                  Music isn&apos;t just heard - {" "}
                   <em
                     className="
                       font-normal
@@ -888,9 +888,7 @@ export default function TheStorySection() {
                 "
               >
                 {[
-                  "Music",
-                  "Discipline",
-                  "Performance",
+                 
                 ].map((item, index) => (
                   <div
                     key={item}

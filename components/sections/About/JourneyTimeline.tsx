@@ -140,7 +140,7 @@ function BackgroundLayer({
 
     const distance = Math.min(Math.abs(value - center) / step, 1);
 
-    return 1 + distance * (viewport.isNarrow ? 0.035 : 0.08);
+    return 1 + distance * (viewport.isNarrow ? 0.025 : 0.045);
   });
 
   const y = useTransform(progress, (value) => {
@@ -151,17 +151,7 @@ function BackgroundLayer({
     const difference = value - center;
     const movement = Math.max(-1, Math.min(1, difference / step));
 
-    return `${movement * (viewport.isNarrow ? -1.25 : -2.5)}%`;
-  });
-
-  const filter = useTransform(progress, (value) => {
-    if (reduceMotion || viewport.isNarrow) {
-      return "blur(0px)";
-    }
-
-    const distance = Math.min(Math.abs(value - center) / step, 1);
-
-    return `blur(${distance * 3}px)`;
+    return `${movement * (viewport.isNarrow ? -0.9 : -1.6)}%`;
   });
 
   return (
@@ -174,12 +164,13 @@ function BackgroundLayer({
         opacity,
         scale,
         y,
-        filter,
-        backgroundImage: `url("${milestone.image}")`,
+        backgroundImage: milestone.image
+          ? `url("${milestone.image}")`
+          : "none",
         backgroundPosition: milestone.imagePosition || "center",
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
-        willChange: "opacity, transform, filter",
+        willChange: "opacity, transform",
       }}
     />
   );
@@ -312,7 +303,7 @@ function ContentLayer({
         paddingBottom: viewport.isLandscapeNarrow
           ? "24px"
           : viewport.isPhone
-            ? "max(48px, calc(7dvh + env(safe-area-inset-bottom, 0px)))"
+            ? "max(48px, calc(7svh + env(safe-area-inset-bottom, 0px)))"
             : viewport.isTablet
               ? "clamp(58px, 8vh, 92px)"
               : viewport.isShortScreen
@@ -499,9 +490,22 @@ export default function JourneyTimeline() {
       window.cancelAnimationFrame(animationFrame);
 
       animationFrame = window.requestAnimationFrame(() => {
-        setScreenSize({
-          width: window.innerWidth,
-          height: window.innerHeight,
+        const nextWidth = window.innerWidth;
+        const nextHeight = window.innerHeight;
+
+        setScreenSize((current) => {
+          const widthChanged = Math.abs(nextWidth - current.width) > 1;
+          const meaningfulHeightChange =
+            Math.abs(nextHeight - current.height) > 120;
+
+          if (!widthChanged && !meaningfulHeightChange) {
+            return current;
+          }
+
+          return {
+            width: nextWidth,
+            height: nextHeight,
+          };
         });
       });
     };
@@ -512,15 +516,11 @@ export default function JourneyTimeline() {
     window.addEventListener("orientationchange", updateScreenSize, {
       passive: true,
     });
-    window.visualViewport?.addEventListener("resize", updateScreenSize, {
-      passive: true,
-    });
 
     return () => {
       window.cancelAnimationFrame(animationFrame);
       window.removeEventListener("resize", updateScreenSize);
       window.removeEventListener("orientationchange", updateScreenSize);
-      window.visualViewport?.removeEventListener("resize", updateScreenSize);
     };
   }, []);
 
@@ -545,9 +545,11 @@ export default function JourneyTimeline() {
   });
 
   const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: viewport.isNarrow ? 78 : 90,
-    damping: viewport.isNarrow ? 30 : 28,
-    mass: viewport.isNarrow ? 0.45 : 0.35,
+    stiffness: viewport.isNarrow ? 190 : 220,
+    damping: viewport.isNarrow ? 38 : 42,
+    mass: viewport.isNarrow ? 0.22 : 0.18,
+    restDelta: 0.0005,
+    restSpeed: 0.01,
   });
 
   useMotionValueEvent(smoothProgress, "change", (latestProgress) => {
@@ -634,10 +636,14 @@ export default function JourneyTimeline() {
     )`;
 
   const sectionHeight = viewport.isLandscapeNarrow
-    ? milestones.length * 125
-    : viewport.isNarrow
-      ? milestones.length * 108
-      : milestones.length * 115;
+    ? milestones.length * 70
+    : viewport.isTinyPhone
+      ? milestones.length * 74
+      : viewport.isNarrow
+        ? milestones.length * 78
+        : viewport.isShortScreen
+          ? milestones.length * 76
+          : milestones.length * 82;
 
   return (
     <section
@@ -655,7 +661,7 @@ export default function JourneyTimeline() {
           position: "sticky",
           top: 0,
           width: "100%",
-          height: "100dvh",
+          height: viewport.isNarrow ? "100svh" : "100vh",
           minHeight: "100svh",
           overflow: "hidden",
           isolation: "isolate",
@@ -672,17 +678,19 @@ export default function JourneyTimeline() {
             background: "#050505",
           }}
         >
-          {milestones.map((milestone, index) => (
-            <BackgroundLayer
-              key={`${milestone.navigationTitle}-background`}
-              milestone={milestone}
-              index={index}
-              total={milestones.length}
-              progress={smoothProgress}
-              reduceMotion={reduceMotion}
-              viewport={viewport}
-            />
-          ))}
+          {milestones.map((milestone, index) =>
+            Math.abs(index - activeIndex) <= 1 ? (
+              <BackgroundLayer
+                key={`${milestone.navigationTitle}-background`}
+                milestone={milestone}
+                index={index}
+                total={milestones.length}
+                progress={smoothProgress}
+                reduceMotion={reduceMotion}
+                viewport={viewport}
+              />
+            ) : null
+          )}
         </div>
 
         <div
@@ -722,7 +730,7 @@ export default function JourneyTimeline() {
                 )`,
           }}
           transition={{
-            duration: 0.8,
+            duration: viewport.isNarrow ? 0.22 : 0.36,
             ease: "easeOut",
           }}
           style={{
@@ -736,7 +744,10 @@ export default function JourneyTimeline() {
         <motion.div
           aria-hidden="true"
           animate={
-            reduceMotion || viewport.isNarrow
+            reduceMotion ||
+            viewport.isNarrow ||
+            viewport.width <= 1600 ||
+            viewport.isShortScreen
               ? undefined
               : {
                   x: ["0%", "1.5%", "-1%", "1%", "0%"],
@@ -990,17 +1001,19 @@ export default function JourneyTimeline() {
             zIndex: 5,
           }}
         >
-          {milestones.map((milestone, index) => (
-            <ContentLayer
-              key={`${milestone.navigationTitle}-content`}
-              milestone={milestone}
-              index={index}
-              total={milestones.length}
-              progress={smoothProgress}
-              reduceMotion={reduceMotion}
-              viewport={viewport}
-            />
-          ))}
+          {milestones.map((milestone, index) =>
+            Math.abs(index - activeIndex) <= 1 ? (
+              <ContentLayer
+                key={`${milestone.navigationTitle}-content`}
+                milestone={milestone}
+                index={index}
+                total={milestones.length}
+                progress={smoothProgress}
+                reduceMotion={reduceMotion}
+                viewport={viewport}
+              />
+            ) : null
+          )}
         </div>
 
         {!viewport.isNarrow && (

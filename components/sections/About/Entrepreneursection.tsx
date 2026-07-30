@@ -28,7 +28,7 @@ const cleanFont = Manrope({
 
 const ENTREPRENEUR_IMAGE = "/images/afterrmatch.png";
 const AFTERMATCH_LOGO = "/images/afterrlogo.webp";
-const AFTERMATCH_URL = "#";
+const AFTERMATCH_URL = "https://www.afterrmatch.com/";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 const SPRING = {

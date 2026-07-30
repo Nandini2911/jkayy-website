@@ -12,8 +12,10 @@ import {
   bodyFont,
   displayFont,
   premiumEase,
-  REEL_URL,
 } from "./galleryShared";
+
+const REEL_URL =
+  "https://cdn.shopify.com/videos/c/o/v/dd974ec2255543949aa24530cb734ca7.mp4";
 
 export default function FeaturedReel() {
   const reducedMotion = useReducedMotion() ?? false;
@@ -105,7 +107,7 @@ export default function FeaturedReel() {
                 fontFamily: bodyFont.style.fontFamily,
               }}
             >
-              03 · Featured Reel
+              Featured Reel
             </span>
 
             <span

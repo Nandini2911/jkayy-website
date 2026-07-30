@@ -30,7 +30,7 @@ const cleanFont = Manrope({
 });
 
 type ShowcaseItem = {
-  number: string;
+
   label: string;
   title: string;
   description: string;
@@ -46,43 +46,43 @@ type PreviewVideoProps = {
 
 const showcaseItems: ShowcaseItem[] = [
   {
-    number: "01",
+  
     label: "Live Performance",
     title: "Where sound becomes an experience.",
     description:
       "An atmosphere built through music, movement and an unforgettable connection with the audience.",
     videoUrl:
-      "https://res.cloudinary.com/dl9zkv77/video/upload/v1784203712/k1_1_oegxxn.mp4",
+      "https://cdn.shopify.com/videos/c/o/v/7bb9912065244711ae0e22b8ce8c58a1.mp4",
     imageUrl: "/images/k1.webp",
   },
   {
-    number: "02",
+  
     label: "The Energy",
     title: "Every stage carries a different emotion.",
     description:
       "From intimate moments to powerful live energy, every performance is created to be felt.",
     videoUrl:
-      "https://res.cloudinary.com/dl9zkv77/video/upload/v1784116924/Untitled_design_2_ftmu1d.mp4",
+      "https://cdn.shopify.com/videos/c/o/v/565ecb0878e04842a3f53a5bf3e7f2be.mp4",
     imageUrl: "/images/k2.webp",
   },
   {
-    number: "03",
+  
     label: "Behind The Music",
     title: "Created with intention. Performed with feeling.",
     description:
       "A closer look at the moments, preparation and emotion behind every JKAYY performance.",
     videoUrl:
-      "https://res.cloudinary.com/dl9zkv77/video/upload/Untitled_design_awrbkq.mp4",
+      "https://cdn.shopify.com/videos/c/o/v/18e7631a877343db9e558534585a1b5e.mp4",
     imageUrl: "/images/k3.webp",
   },
   {
-    number: "04",
+   
     label: "Unforgettable Nights",
     title: "The music ends. The feeling remains.",
     description:
       "Cinematic performances designed to stay with the audience long after the final note.",
     videoUrl:
-      "https://res.cloudinary.com/dl9zkv77/video/upload/v1784203971/k2_1_rntepf.mp4",
+      "https://cdn.shopify.com/videos/c/o/v/bf840fbaf4f340ce8952a863dbb2c2ba.mp4",
     imageUrl: "/images/k4.webp",
   },
 ];
@@ -727,7 +727,7 @@ export default function PerformanceShowcaseSection() {
 
                 return (
                   <motion.article
-                    key={item.number}
+                  
                     initial={
                       reduceMotion
                         ? false
@@ -1321,7 +1321,7 @@ export default function PerformanceShowcaseSection() {
                                   "0.18em",
                               }}
                             >
-                              {item.number}
+                        
                             </span>
 
                             <span
@@ -1367,7 +1367,7 @@ export default function PerformanceShowcaseSection() {
                                   "0.18em",
                               }}
                             >
-                              {item.number}
+                             
                             </span>
                           </>
                         )}
@@ -1584,7 +1584,7 @@ export default function PerformanceShowcaseSection() {
                     "rgba(255,255,255,0.55)",
                 }}
               >
-                {selectedVideo.number} ·{" "}
+              
                 {selectedVideo.label}
               </div>
 

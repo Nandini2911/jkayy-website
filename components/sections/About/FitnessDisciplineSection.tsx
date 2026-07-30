@@ -31,7 +31,7 @@ const cleanFont = Manrope({
   display: "swap",
 });
 
-const FITNESS_VIDEO = "https://res.cloudinary.com/dl9zkv77/video/upload/v1784792815/reels__1784541648840_ola4l6.mp4";
+const FITNESS_VIDEO = "https://cdn.shopify.com/videos/c/o/v/8aa0d31ccb11478c8f6a4ca590bd8a0e.mp4";
 const FITNESS_POSTER = "jkgym2.webp";
 
 const disciplinePoints = ["Strength", "Focus", "Consistency"];
@@ -700,15 +700,7 @@ export default function FitnessDisciplineSection() {
                   "
                 >
                   <div className="flex items-center gap-5 sm:gap-7">
-                    <span
-                      className="
-                        text-[8px] font-semibold
-                        tracking-[0.26em]
-                        text-white/32
-                      "
-                    >
-                      0{index + 1}
-                    </span>
+                    
 
                     <span
                       className="

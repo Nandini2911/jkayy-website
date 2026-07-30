@@ -55,7 +55,7 @@ const lifestyleItems: LifestyleItem[] = [
     title: "Miles Away",
     subtitle: "New roads. New perspective.",
    
-    video: "https://res.cloudinary.com/dl9zkv77/video/upload/v1784724020/jkayyofficial_10_fp9fqy.mp4",
+    video: "https://cdn.shopify.com/videos/c/o/v/a6b40e74b5a140b4a9b9e4775302ec50.mp4",
     poster: "",
     aspectRatio: "0.63",
   },
@@ -64,7 +64,7 @@ const lifestyleItems: LifestyleItem[] = [
     title: "Above The Noise",
     subtitle: "Finding silence at a higher altitude.",
 
-    video: "https://res.cloudinary.com/dl9zkv77/video/upload/v1784724369/jkayyofficial_11_yp2mmu.mp4",
+    video: "https://cdn.shopify.com/videos/c/o/v/4fd6c5fc07fb46faa4eaf037d4b26f22.mp4",
     poster: "",
     aspectRatio: "0.82",
   },
@@ -82,7 +82,7 @@ const lifestyleItems: LifestyleItem[] = [
     title: "Before The Lights",
     subtitle: "The moments the audience never sees.",
   
-    video: "https://res.cloudinary.com/dl9zkv77/video/upload/v1784724758/jkayyofficial_12_w4nzbe.mp4",
+    video: "https://cdn.shopify.com/videos/c/o/v/8086446e390a4e198f5230bdd6438f9a.mp4",
     poster: "",
     aspectRatio: "0.68",
   },
@@ -92,7 +92,7 @@ const lifestyleItems: LifestyleItem[] = [
     title: "The Long Way Up",
     subtitle: "Every climb changes something within.",
 
-    video: "https://res.cloudinary.com/dl9zkv77/video/upload/v1784724961/jkayyofficial_14_odimnt.mp4",
+    video: "https://cdn.shopify.com/videos/c/o/v/39f67d0775b34176beb7598a987c1f21.mp4",
     poster: "",
     aspectRatio: "0.58",
     objectPosition: "center 35%",
@@ -102,7 +102,7 @@ const lifestyleItems: LifestyleItem[] = [
     title: "On The Move",
     subtitle: "Collecting stories across unfamiliar places.",
     
-    video: "https://res.cloudinary.com/dl9zkv77/video/upload/v1784725273/jkayyofficial_15_ubh3vt.mp4",
+    video: "https://cdn.shopify.com/videos/c/o/v/8824b0b2b4f34a018985d98e2c9e74f8.mp4",
     poster: "",
     aspectRatio: "1.14",
   },
@@ -137,7 +137,7 @@ const lifestyleItems: LifestyleItem[] = [
   title: "Seconds Before",
     subtitle: "A final pause before stepping on stage.",
     
-    video: "https://res.cloudinary.com/dl9zkv77/video/upload/v1784537170/jkayyofficial_3_ggonwj.mp4",
+    video: "https://cdn.shopify.com/videos/c/o/v/d3bc88e3a9a049bd89340de260f2aa44.mp4",
     poster: "",
     aspectRatio: "1.04",
  }
@@ -165,6 +165,72 @@ function LifestyleCard({
 
   const [isHovered, setIsHovered] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
+  const [isSoundOn, setIsSoundOn] = useState(false);
+  const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
+  const soundOnRef = useRef(false);
+
+  const hasVideo = Boolean(item.video && item.video !== "/");
+
+  const ensureVideoSource = () => {
+    const video = videoRef.current;
+
+    if (!video || !hasVideo) {
+      return false;
+    }
+
+    if (!shouldLoadVideo) {
+      setShouldLoadVideo(true);
+    }
+
+    if (!video.getAttribute("src")) {
+      video.src = item.video;
+      video.load();
+    }
+
+    return true;
+  };
+
+  const playWithSound = () => {
+    const video = videoRef.current;
+
+    if (!video || !ensureVideoSource()) {
+      return;
+    }
+
+    soundOnRef.current = true;
+    setIsSoundOn(true);
+
+    video.muted = false;
+    video.defaultMuted = false;
+    video.volume = 1;
+
+    video.play().catch(() => {
+      /*
+       * Some mobile browsers may reject unmuted playback until
+       * the touch gesture is accepted. In that case keep it paused.
+       */
+      soundOnRef.current = false;
+      setIsSoundOn(false);
+      video.muted = true;
+      video.defaultMuted = true;
+      video.pause();
+    });
+  };
+
+  const stopVideo = () => {
+    soundOnRef.current = false;
+    setIsSoundOn(false);
+
+    const video = videoRef.current;
+
+    if (!video) {
+      return;
+    }
+
+    video.pause();
+    video.muted = true;
+    video.defaultMuted = true;
+  };
 
   const { scrollYProgress } = useScroll({
     target: cardRef,
@@ -198,74 +264,70 @@ function LifestyleCard({
 
   useEffect(() => {
     const card = cardRef.current;
-    const video = videoRef.current;
 
-    if (!card || !video) {
+    if (!card) {
       return;
     }
 
+    if (!hasVideo) {
+      setVideoReady(true);
+      return;
+    }
+
+    const preloadObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldLoadVideo(true);
+          preloadObserver.disconnect();
+        }
+      },
+      {
+        threshold: 0,
+        rootMargin: isMobile
+          ? "480px 0px 480px 0px"
+          : "760px 0px 760px 0px",
+      },
+    );
+
+    preloadObserver.observe(card);
+
+    return () => {
+      preloadObserver.disconnect();
+    };
+  }, [hasVideo, isMobile]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+
+    if (!video || !hasVideo || !shouldLoadVideo) {
+      return;
+    }
+
+    video.pause();
     video.muted = true;
     video.defaultMuted = true;
     video.playsInline = true;
     video.preload = "auto";
 
-    const safelyPlay = () => {
-      video.muted = true;
-      video.defaultMuted = true;
-
-      video.play().catch(() => {
-        // The poster remains visible if autoplay is delayed.
-      });
-    };
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (
-          entry.isIntersecting &&
-          entry.intersectionRatio >= 0.12 &&
-          !document.hidden
-        ) {
-          safelyPlay();
-        } else {
-          video.pause();
-        }
-      },
-      {
-        threshold: [0, 0.12, 0.35, 0.7],
-        rootMargin: "140px 0px 140px 0px",
-      },
-    );
-
     const handleVisibility = () => {
       if (document.hidden) {
-        video.pause();
-      } else {
-        const rect = card.getBoundingClientRect();
-
-        if (
-          rect.bottom > -140 &&
-          rect.top < window.innerHeight + 140
-        ) {
-          safelyPlay();
-        }
+        stopVideo();
       }
     };
 
-    observer.observe(card);
     document.addEventListener(
       "visibilitychange",
       handleVisibility,
     );
 
     return () => {
-      observer.disconnect();
       document.removeEventListener(
         "visibilitychange",
         handleVisibility,
       );
       video.pause();
     };
-  }, []);
+  }, [hasVideo, shouldLoadVideo]);
 
   const desktopRatios = [
     "4 / 5",
@@ -345,8 +407,35 @@ function LifestyleCard({
         }
       >
         <motion.div
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
+          onMouseEnter={() => {
+            setIsHovered(true);
+
+            if (!isMobile) {
+              playWithSound();
+            }
+          }}
+          onMouseLeave={() => {
+            setIsHovered(false);
+
+            if (!isMobile) {
+              stopVideo();
+            }
+          }}
+          onTouchStart={() => {
+            if (isMobile) {
+              playWithSound();
+            }
+          }}
+          onTouchEnd={() => {
+            if (isMobile) {
+              stopVideo();
+            }
+          }}
+          onTouchCancel={() => {
+            if (isMobile) {
+              stopVideo();
+            }
+          }}
           whileHover={
             reduceMotion || isMobile
               ? undefined
@@ -399,36 +488,28 @@ function LifestyleCard({
         >
           <motion.video
             ref={videoRef}
-            src={item.video}
+            src={shouldLoadVideo && hasVideo ? item.video : undefined}
             poster={item.poster}
-            muted
+            muted={!isSoundOn}
             loop
-            autoPlay
             playsInline
-            preload="auto"
+            preload={shouldLoadVideo && hasVideo ? "auto" : "none"}
             disablePictureInPicture
             disableRemotePlayback
             controlsList="nodownload noremoteplayback"
             aria-label={item.title}
-            onLoadedMetadata={() => setVideoReady(true)}
             onLoadedData={() => setVideoReady(true)}
             onCanPlay={() => {
               setVideoReady(true);
 
               const video = videoRef.current;
-              const card = cardRef.current;
 
-              if (!video || !card || document.hidden) {
+              if (!video) {
                 return;
               }
 
-              const rect = card.getBoundingClientRect();
-
-              if (
-                rect.bottom > -140 &&
-                rect.top < window.innerHeight + 140
-              ) {
-                video.play().catch(() => undefined);
+              if (!isHovered || isMobile || document.hidden) {
+                video.pause();
               }
             }}
             onError={() => {
@@ -468,6 +549,12 @@ function LifestyleCard({
               objectPosition:
                 item.objectPosition || "center center",
               backgroundColor: "#111111",
+              transform: "translateZ(0)",
+              backfaceVisibility: "hidden",
+              WebkitBackfaceVisibility: "hidden",
+              willChange: isHovered && !isMobile
+                ? "transform, filter"
+                : "transform",
             }}
           />
 
@@ -637,19 +724,7 @@ function LifestyleCard({
                 "0 3px 18px rgba(0,0,0,0.48)",
             }}
           >
-            {!isMobile && (
-              <span
-                style={{
-                  marginBottom: "7px",
-                  fontSize: "7px",
-                  fontWeight: 600,
-                  letterSpacing: "0.17em",
-                  opacity: 0.58,
-                }}
-              >
-                {String(index + 1).padStart(2, "0")}
-              </span>
-            )}
+           
 
             <div>
               <h3

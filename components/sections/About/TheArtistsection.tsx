@@ -51,7 +51,7 @@ const artistCards: ArtistCard[] = [
     description:
       "Powerful rhythms, seamless transitions and emotionally driven sets.",
     video:
-      "https://res.cloudinary.com/dl9zkv77/video/upload/v1784537170/jkayyofficial_3_ggonwj.mp4",
+      "https://cdn.shopify.com/videos/c/o/v/d3bc88e3a9a049bd89340de260f2aa44.mp4",
    
   },
   {
@@ -60,7 +60,7 @@ const artistCards: ArtistCard[] = [
     description:
       "Every audience is different. Every performance is built around energy, connection and unforgettable moments.",
     video:
-      "https://res.cloudinary.com/dl9zkv77/video/upload/v1784537173/jkayyofficial_2_h963q1.mp4",
+      "https://cdn.shopify.com/videos/c/o/v/13182b2dda7144a6862c7d48b53e9cbe.mp4",
   
   },
   {
@@ -69,7 +69,7 @@ const artistCards: ArtistCard[] = [
     description:
       "Understanding people is what transforms a performance into an experience.",
     video:
-      "https://res.cloudinary.com/dl9zkv77/video/upload/v1784537175/jkayyofficial_4_sdexiy.mp4",
+      "https://cdn.shopify.com/videos/c/o/v/cdb8bfc4d24b498bb82c003b56313941.mp4",
  
   },
 ];

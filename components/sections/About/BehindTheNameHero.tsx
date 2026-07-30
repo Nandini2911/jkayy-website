@@ -47,17 +47,17 @@ const scenes: Scene[] = [
   {
   
     number: "01",
-   src: "https://res.cloudinary.com/dl9zkv77/video/upload/v1784635508/jkayyofficial_9_fyhuq8.mp4",
+   src: "https://cdn.shopify.com/videos/c/o/v/6faa393cc2c14fa8b5e2fdc09aa47af6.mp4",
     audioSrc:
-      "https://res.cloudinary.com/dl9zkv77/video/upload/v1784635508/jkayyofficial_9_fyhuq8.mp4",
+      "https://cdn.shopify.com/videos/c/o/v/6faa393cc2c14fa8b5e2fdc09aa47af6.mp4",
     position: "center center",
   },
   {
 
     number: "02",
-   src: "https://res.cloudinary.com/dl9zkv77/video/upload/v1784537175/jkayyofficial_4_sdexiy.mp4",
+   src: "https://cdn.shopify.com/videos/c/o/v/cdb8bfc4d24b498bb82c003b56313941.mp4",
     audioSrc:
-      "https://res.cloudinary.com/dl9zkv77/video/upload/v1784537175/jkayyofficial_4_sdexiy.mp4",
+      "https://cdn.shopify.com/videos/c/o/v/cdb8bfc4d24b498bb82c003b56313941.mp4",
     position: "center center",
   },
   {
@@ -65,9 +65,9 @@ const scenes: Scene[] = [
     number: "03",
     
 
-       src: "https://res.cloudinary.com/dl9zkv77/video/upload/v1784116924/Untitled_design_2_ftmu1d.mp4",
+       src: "https://cdn.shopify.com/videos/c/o/v/e338409bd12d480f9f7019d735dd9721.mp4",
     audioSrc:
-      "https://res.cloudinary.com/dl9zkv77/video/upload/v1784116924/Untitled_design_2_ftmu1d.mp4",
+      "https://cdn.shopify.com/videos/c/o/v/e338409bd12d480f9f7019d735dd9721.mp4",
     position: "center center",
   },
 ];
@@ -699,55 +699,9 @@ export default function BehindTheNameHero() {
         }}
       />
 
-      {/* TOP FADE — REDUCED */}
+    
 
-      <div
-        aria-hidden="true"
-        className="
-          pointer-events-none
-          absolute
-          inset-x-0
-          top-0
-          z-[3]
-          h-[11%]
-        "
-        style={{
-          background: `
-            linear-gradient(
-              180deg,
-              rgba(246,246,242,0.32) 0%,
-              rgba(246,246,242,0.10) 55%,
-              transparent 100%
-            )
-          `,
-        }}
-      />
-
-      {/* BOTTOM FADE — REDUCED */}
-
-      <div
-        aria-hidden="true"
-        className="
-          pointer-events-none
-          absolute
-          inset-x-0
-          bottom-0
-          z-[3]
-          h-[21%]
-        "
-        style={{
-          background: `
-            linear-gradient(
-              0deg,
-              rgba(244,244,240,0.58) 0%,
-              rgba(244,244,240,0.27) 38%,
-              rgba(244,244,240,0.07) 72%,
-              transparent 100%
-            )
-          `,
-        }}
-      />
-
+      
       {/* SUBTLE GRID */}
 
       <div
@@ -1118,7 +1072,7 @@ export default function BehindTheNameHero() {
             "
           >
             <div>
-              <MaskReveal delay={0.86}>
+              <MaskReveal delay={0.20}>
                 <h2
                   className="
                     text-[clamp(1.65rem,3vw,2.85rem)]

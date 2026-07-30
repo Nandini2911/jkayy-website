@@ -41,22 +41,22 @@ const navigationLinks = [
   },
   {
     label: "About",
-    href: "#about",
+    href: "/about",
   },
   {
     label: "Events",
-    href: "#events",
+    href: "/events",
   },
   {label: "Gallery", 
-    href: "#gallery"
+    href: "/gallery"
 },
   {
     label: "Music",
-    href: "#music",
+    href: "/music",
   },
   {
     label: "Contact",
-    href: "#contact",
+    href: "/contact",
   },
 ];
 
@@ -188,23 +188,16 @@ const socialLinks = [
     handle: "@jkayy",
     description:
       "Behind the scenes & live moments",
-    href: "https://www.instagram.com/",
+    href: "https://www.instagram.com/jkayyofficial?igsh=MW4wdGE2b2x0cWlpdA==",
     icon: InstagramIcon,
   },
-  {
-    label: "YouTube",
-    handle: "JKAYY Official",
-    description:
-      "Performances, films & showreels",
-    href: "https://www.youtube.com/",
-    icon: YouTubeIcon,
-  },
+ 
   {
     label: "Spotify",
     handle: "Listen on Spotify",
     description:
       "Original music & latest releases",
-    href: "https://open.spotify.com/",
+    href: "https://open.spotify.com/track/5IVkBMMh6hgRvvEpwXEX1t?si=-hK74JkxTR682C5IPXje_A&utm_source=copy-linkhttps://open.spotify.com/",
     icon: SpotifyIcon,
   },
 ];
@@ -595,43 +588,11 @@ export default function Footer() {
               experiences.
             </p>
 
-            <Link
-              href={`mailto:${BOOKING_EMAIL}`}
-              className="
-                group
-                inline-flex
-                items-center
-                gap-4
-                rounded-full
-                border
-                border-white
-                bg-white
-                px-7
-                py-4
-                text-[9px]
-                font-semibold
-                uppercase
-                tracking-[0.24em]
-                text-black
-                transition-all
-                duration-500
-                hover:-translate-y-1
-                hover:bg-transparent
-                hover:text-white
-              "
-            >
-              Book JKAYY
+           
+         
 
-              <ArrowUpRight
-                size={15}
-                className="
-                  transition-transform
-                  duration-500
-                  group-hover:translate-x-1
-                  group-hover:-translate-y-1
-                "
-              />
-            </Link>
+              
+           
           </motion.div>
         </div>
 
@@ -1178,27 +1139,8 @@ export default function Footer() {
               gap-y-3
             "
           >
-            <Link
-              href="/privacy-policy"
-              className="
-                transition-colors
-                duration-300
-                hover:text-white
-              "
-            >
-              Privacy
-            </Link>
-
-            <Link
-              href="/terms"
-              className="
-                transition-colors
-                duration-300
-                hover:text-white
-              "
-            >
-              Terms
-            </Link>
+            
+           
 
             <span>
               Live Beyond Sound

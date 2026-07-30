@@ -39,7 +39,7 @@ const cleanFont = Manrope({
 type MediaType = "image" | "video";
 
 type BehindDeckItem = {
-  number: string;
+
   label: string;
   title: string;
   description: string;
@@ -61,18 +61,18 @@ type MediaCardProps = {
 
 const behindDeckItems: BehindDeckItem[] = [
   {
-    number: "01",
+  
     label: "Producing Music",
     title: "Layer by layer.",
     description:
       "Every beat, texture and transition is shaped with purpose.",
     mediaUrl:
-      "https://res.cloudinary.com/dl9zkv77/video/upload/v1784274215/behind_video_foxfh3.mp4",
+      "https://cdn.shopify.com/videos/c/o/v/a1f57461ad2c4b4fad6c605c36f64ae6.mp4",
     mediaType: "video",
     position: "center",
   },
   {
-    number: "02",
+
     label: "Studio Setup",
     title: "Where every sound begins.",
     description:
@@ -82,12 +82,12 @@ const behindDeckItems: BehindDeckItem[] = [
     position: "center",
   },
   {
-    number: "03",
+   
     label: "Travel",
     title: "Between cities.",
     description:
       "The journey between one performance and the next becomes part of the story.",
-    mediaUrl: "/images/behind.webp",
+    mediaUrl: "/images/ad2.jpg",
     mediaType: "image",
     position: "center",
   },
@@ -394,31 +394,12 @@ function MediaCard({
             letterSpacing: "0.26em",
           }}
         >
-          <span>{item.number}</span>
+        
 
-          <span
-            style={{
-              display: "block",
-
-              width: isMobile ? "25px" : "46px",
-              height: "1px",
-
-              background: "rgba(255,255,255,0.72)",
-            }}
-          />
+         
         </div>
 
-        <span
-          aria-hidden="true"
-          style={{
-            fontFamily: cleanFont.style.fontFamily,
-
-            fontSize: isMobile ? "15px" : "19px",
-            fontWeight: 300,
-          }}
-        >
-          ↗
-        </span>
+      
       </div>
 
       {/* PLAY BUTTON */}
@@ -992,7 +973,7 @@ export default function BehindTheDecksSection() {
                   />
 
                   <p style={{ margin: 0 }}>
-                    12 — Behind The Decks
+                     Behind The Decks
                   </p>
 
                   <span
@@ -1403,25 +1384,9 @@ export default function BehindTheDecksSection() {
                 textTransform: "uppercase",
               }}
             >
-              <span
-                style={{
-                  display: "block",
+             
 
-                  width: isMobile ? "28px" : "52px",
-                  height: "1px",
-
-                  background: "rgba(0,0,0,0.28)",
-                }}
-              />
-
-              <p
-                style={{
-                  margin: 0,
-                  whiteSpace: "nowrap",
-                }}
-              >
-                Selected moments
-              </p>
+            
 
               <span
                 style={{

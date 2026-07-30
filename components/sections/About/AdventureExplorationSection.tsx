@@ -31,7 +31,7 @@ const cleanFont = Manrope({
   display: "swap",
 });
 
-const ADVENTURE_VIDEO = "https://res.cloudinary.com/dl9zkv77/video/upload/v1784792580/jkayyofficial_7_raupph.mp4";
+const ADVENTURE_VIDEO = "https://cdn.shopify.com/videos/c/o/v/0f390617f65e417c828f78f227f83c78.mp4";
 
 
 
@@ -41,7 +41,7 @@ const ADVENTURE_VIDEO = "https://res.cloudinary.com/dl9zkv77/video/upload/v17847
   You can replace this path with another video later.
 */
 const GALLERY_BACKGROUND_VIDEO =
-  "https://res.cloudinary.com/dl9zkv77/video/upload/v1784791995/adventure-drone_lkd1aj.mp4";
+  "https://cdn.shopify.com/videos/c/o/v/880b7db15f0a4eb3942fbf0d0722d0ab.mp4";
 
 
 type AdventureGalleryItem = {

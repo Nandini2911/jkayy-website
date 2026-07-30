@@ -63,6 +63,8 @@ const content = {
     "As a producer and entrepreneur, his vision extends beyond the stage—building a world where creativity, technology and culture come together to create unforgettable nights.",
 };
 
+const INSTAGRAM_URL = "https://www.instagram.com/jkayyofficial?igsh=MW4wdGE2b2x0cWlpdA==";
+
 function useViewportWidth() {
   const [viewportWidth, setViewportWidth] = useState(1440);
 
@@ -1422,6 +1424,119 @@ export default function AboutSection() {
               />
             </p>
           </div>
+
+          <motion.a
+            href={INSTAGRAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Visit JKAYY on Instagram"
+            initial={{
+              opacity: 0,
+              y: 12,
+            }}
+            animate={
+              sectionInView
+                ? {
+                    opacity: 1,
+                    y: 0,
+                  }
+                : {
+                    opacity: 0,
+                    y: 12,
+                  }
+            }
+            transition={{
+              duration: minimalMotion ? 0 : 0.5,
+              delay: minimalMotion ? 0 : 3.1,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+            whileHover={
+              minimalMotion
+                ? undefined
+                : {
+                    y: -2,
+                    scale: 1.015,
+                  }
+            }
+            whileTap={{
+              scale: 0.98,
+            }}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "10px",
+
+              minHeight: isMobile ? "44px" : "48px",
+              marginTop: isMobile ? "24px" : "30px",
+              padding: isMobile
+                ? "0 18px"
+                : "0 22px",
+
+              border:
+                "1px solid rgba(255,255,255,0.28)",
+              borderRadius: "999px",
+
+              color: "#ffffff",
+              background:
+                "rgba(255,255,255,0.06)",
+
+              boxShadow:
+                "inset 0 1px 0 rgba(255,255,255,0.1)",
+
+              fontSize: isMobile ? "9px" : "10px",
+              fontWeight: 700,
+              letterSpacing: isMobile
+                ? "0.2em"
+                : "0.24em",
+              textDecoration: "none",
+              textTransform: "uppercase",
+
+              cursor: "pointer",
+              backdropFilter: "blur(10px)",
+              WebkitBackdropFilter: "blur(10px)",
+            }}
+          >
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              width={isMobile ? 15 : 16}
+              height={isMobile ? 15 : 16}
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              style={{
+                display: "block",
+                flex: "0 0 auto",
+              }}
+            >
+              <rect
+                x="3"
+                y="3"
+                width="18"
+                height="18"
+                rx="5"
+                stroke="currentColor"
+                strokeWidth="1.8"
+              />
+
+              <circle
+                cx="12"
+                cy="12"
+                r="4.25"
+                stroke="currentColor"
+                strokeWidth="1.8"
+              />
+
+              <circle
+                cx="17.4"
+                cy="6.8"
+                r="1"
+                fill="currentColor"
+              />
+            </svg>
+
+            Follow on Instagram
+          </motion.a>
         </motion.div>
       </div>
     </section>
