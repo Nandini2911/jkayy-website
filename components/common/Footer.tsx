@@ -32,7 +32,7 @@ const SMOOTH_EASE = [
 ] as const;
 
 const BOOKING_EMAIL =
-  "bookings@jkayy.com";
+  "booking@jkayy.com";
 
 const navigationLinks = [
   {
@@ -1144,6 +1144,23 @@ export default function Footer() {
 
             <span>
               Live Beyond Sound
+            </span>
+
+            <span className="text-white/45">
+              Developed by{" "}
+              <Link
+                href="https://dtsworld.in"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="
+                  text-white
+                  transition-opacity
+                  duration-300
+                  hover:opacity-60
+                "
+              >
+                Double Trouble Studio
+              </Link>
             </span>
           </div>
         </div>
